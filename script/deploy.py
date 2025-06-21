@@ -1,12 +1,22 @@
-from src import Counter
-from moccasin.boa_tools import VyperContract
+from src import load_datacontract_initcode_prefix
 
-def deploy() -> VyperContract:
-    counter: VyperContract = Counter.deploy()
-    print("Starting count: ", counter.number())
-    counter.increment()
-    print("Ending count: ", counter.number())
-    return counter
+import boa
 
-def moccasin_main() -> VyperContract:
+import json
+import subprocess
+
+def deploy_hex0():
+    datacontract_initcode_prefix = load_datacontract_initcode_prefix()
+    data = json.loads(subprocess.run(
+        ("solc", "--combined-json=bin", "src/hex0.sol"),
+        check=True,
+        stdout=subprocess.PIPE,
+    ).stdout)
+    initcode = bytes.fromhex(data["contracts"]["src/hex0.sol:hex0"]["bin"])
+    initcode += datacontract_initcode_prefix.ljust(32, b'\0')
+    print(initcode)
+    address, _ = boa.env.deploy_code(bytecode=initcode)
+    return address
+
+def moccasin_main():
     return deploy()

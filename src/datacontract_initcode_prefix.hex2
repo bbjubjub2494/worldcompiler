@@ -1,0 +1,13 @@
+:start
+60 # PUSH1
+!end>start # 11 ; initcodelen
+80 # DUP1 ; initcodelen, initcodelen
+38 # CODESIZE ; codesize, initcodelen, initcodelen
+03 # SUB ; codesize - initcodelen, initcodelen
+80 # DUP1 ; codesize - initcodelen, codesize - initcodelen, initcodelen
+91 # SWAP2 ; initcodelen, codesize - initcodelen,  codesize - initcodelen
+5f # PUSH0 ; 0, initcodelen, codesize - initcodelen,  codesize - initcodelen
+39 # CODECOPY ; codesize - initcodelen
+5f # PUSH0 ; 0, codesize - initcodelen
+f3 # RETURN ;
+:end

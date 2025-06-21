@@ -1,6 +1,11 @@
 import pytest
-from script.deploy import deploy
+from script.deploy import deploy_hex0
+import src
 
 @pytest.fixture
-def counter_contract():
-    return deploy()
+def hex0_contract():
+    return deploy_hex0()
+
+@pytest.fixture
+def datacontract_initcode_prefix():
+    return src.load_datacontract_initcode_prefix()
