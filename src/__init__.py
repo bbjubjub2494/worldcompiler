@@ -1,4 +1,6 @@
 import subprocess
+from pathlib import Path
+import tempfile
 
 def load_datacontract_initcode_prefix():
     # FIXME: hardcoded path
@@ -10,17 +12,19 @@ def load_datacontract_initcode_prefix():
     return r.stdout
 
 def load_inputaddressed_initcode_template():
-    r = subprocess.run(
-        ("M1", "-f", "src/evm_defs.M1", "-f", "src/inputaddressed_initcode_template.M1"),
-        check=True,
-        stdout=subprocess.PIPE,
-    )
-    r = subprocess.run(
-        ("hex2"),
-        check=True,
-        stdin=r.stdout,
-        stdout=subprocess.PIPE,
-    )
-    return r.stdout
+    return compile_M2("src/inputaddressed_initcode_template.M1")
 
-print(load_inputaddressed_initcode_template())
+def compile_M2(src):
+    src = Path(src)
+    with tempfile.NamedTemporaryFile(
+        prefix=f".{src.stem}", suffix='.hex2', dir=src.parent
+    ) as tmp_hex2:
+        subprocess.run(
+            ("M1", "-f", "src/evm_defs.M1", "-f", src, "-o", tmp_hex2.name),
+            check=True,
+        )
+        return subprocess.run(
+            ("hex2", "-f", tmp_hex2.name),
+            check=True,
+            stdout=subprocess.PIPE,
+        ).stdout

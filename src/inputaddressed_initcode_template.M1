@@ -12,19 +12,28 @@ INVALID
 :contract_check_ok
 JUMPDEST
 
-CALLDATASIZE
-PUSH0
-PUSH0
-CALLDATACOPY
+PUSH0                   ; STACK STATE
+PUSH1 !input_data>start ; data_offset, 0, function_address
+DUP1                    ; data_offset, data_offset, ...
+CODESIZE                ; codesize, data_offset, data_offset, ...
+SUB                     ; codesize - data_offset, data_offset, ...
+DUP1                    ; codesize - data_offset, codesize - data_offset, data_offset, ...
+SWAP2                   ; data_offset, codesize - data_offset, codesize - data_offset, ...
+PUSH0                   ; 0, data_offset, codesize - data_offset, codesize - data_offset, ...
+CODECOPY                ; codesize - data_offset, ...
+PUSH0                   ; 0, codesize - data_offset, ...
+PUSH0                   ; 0, 0, codesize - data_offset, ...
+PUSH0                   ; 0, 0, 0, codesize - data_offset, ...
+SWAP5                   ; function_address, 0, 0, 0, codesize - data_offset, 0
+GAS                     ; gas, function_address, 0, 0, 0, codesize - data_offset, 0
+CALL
+PUSH1 !call_status_ok>start
+JUMPI
+; the contract reverted: abort
+INVALID
 
-PUSH0
-PUSH0
-CALLDATASIZE
-PUSH0
-SWAP4
-GAS
-STATICCALL ; gas, input_address, 0, input_size, 0, 0
-
+:call_status_ok
+JUMPDEST
 RETURNDATASIZE
 PUSH0
 PUSH0
@@ -32,5 +41,7 @@ RETURNDATACOPY
 
 RETURNDATASIZE
 PUSH0
-PUSH0
 RETURN
+
+:input_data
+;; unreachable by execution, input data goes here

@@ -9,3 +9,7 @@ def hex0_contract():
 @pytest.fixture
 def datacontract_initcode_prefix():
     return src.load_datacontract_initcode_prefix()
+
+@pytest.fixture
+def inputaddressed_initcode_template():
+    return src.load_inputaddressed_initcode_template()
