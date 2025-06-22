@@ -15,6 +15,7 @@ contract hex0 {
         
         while (i < input.length) {
             uint8 v = uint8(input[i]);
+            i++;
             
             if (v >= 97 && v <= 102) { // 'a' to 'f'
                 hold |= v - 87;
@@ -24,17 +25,15 @@ contract hex0 {
                 hold |= v - 55;
             } else if (v == 59 || v == 35) { // ';' or '#' - comment handling
                 // Skip to end of line
-                while (true) {
-                    i++;
+                while (i < input.length) {
                     v = uint8(input[i]);
+		    i++;
                     if (v == 13 || v == 10) { // '\r' or '\n'
                         break;
                     }
                 }
-                i++;
                 continue; // no nibble to output
             } else {
-                i++;
                 continue; // no nibble to output
             }
             
@@ -46,7 +45,6 @@ contract hex0 {
                 hold <<= 4;
                 toggle = true;
             }
-            i++;
         }
     }
 }
