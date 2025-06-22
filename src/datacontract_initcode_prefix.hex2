@@ -1,6 +1,6 @@
 :start
 60 # PUSH1
-!end>start # 11 ; initcodelen
+!end>start ; initcodelen
 80 # DUP1 ; initcodelen, initcodelen
 38 # CODESIZE ; codesize, initcodelen, initcodelen
 03 # SUB ; codesize - initcodelen, initcodelen
