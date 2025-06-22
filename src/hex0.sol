@@ -8,11 +8,10 @@ contract hex0 {
         datacontractInitcodePrefix = _datacontractInitcodePrefix;
     }
     
-    fallback(bytes calldata input) external returns (bytes memory) {
+    fallback(bytes calldata input) external returns (bytes memory output) {
         uint256 i = 0;
         bool toggle = false;
         uint256 hold = 0;
-        bytes memory output = abi.encodePacked(datacontractInitcodePrefix);
         
         while (i < input.length) {
             uint8 c = uint8(input[i]);
@@ -51,13 +50,5 @@ contract hex0 {
             }
             i++;
         }
-        
-        // Return the processed data
-	address deployed_address;
-        assembly {
-		// TODO: salt is the hash of the input
-            deployed_address := create2(0, add(output, 0x20), mload(output), 0)
-        }
-	return abi.encode(deployed_address);
     }
 }

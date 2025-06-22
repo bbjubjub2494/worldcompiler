@@ -1,0 +1,36 @@
+;; This creation code implements input addressing. This means: the address of a contract reflects a function (which is another contract) and an input value, and the contract at that address is the output of that function on the given input. Since it is possible to compute the address without knowing the output, this allows looking up an output on-chain that was previously computed.
+
+:start
+PUSH20 '00000000 00000000 00000000 00000000 00000004' ; input address, here the identity precompile but to be substituted
+DUP1 ; save at the bottom of the stack
+EXTCODESIZE
+PUSH1 !contract_check_ok>start
+JUMPI
+; the contract has not been deployed, abort
+INVALID
+
+:contract_check_ok
+JUMPDEST
+
+CALLDATASIZE
+PUSH0
+PUSH0
+CALLDATACOPY
+
+PUSH0
+PUSH0
+CALLDATASIZE
+PUSH0
+SWAP4
+GAS
+STATICCALL ; gas, input_address, 0, input_size, 0, 0
+
+RETURNDATASIZE
+PUSH0
+PUSH0
+RETURNDATACOPY
+
+RETURNDATASIZE
+PUSH0
+PUSH0
+RETURN
