@@ -14,7 +14,7 @@ def test_program_offset(inputaddressed_initcode_template):
 def test_inputaddressed_identity(inputaddressed_initcode_template):
     identity = bytes.fromhex("365f5f37365ff3")  # identity contract per EIP-7666
     boa.env.set_code(IDENTITY_ADDRESS, identity)
-    #TODO boa.deregister_precompile(IDENTITY_ADDRESS)
+    boa.vm.py_evm.deregister_raw_precompile(IDENTITY_ADDRESS)
 
     data = b"test"
     bytecode = bytearray(inputaddressed_initcode_template)
