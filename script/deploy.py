@@ -6,17 +6,24 @@ import json
 import subprocess
 
 def deploy_hex0():
-    datacontract_initcode_prefix = load_datacontract_initcode_prefix()
-    data = json.loads(subprocess.run(
-        ("solc", "--combined-json=bin", "src/hex0.sol"),
-        check=True,
-        stdout=subprocess.PIPE,
-    ).stdout)
-    initcode = bytes.fromhex(data["contracts"]["src/hex0.sol:hex0"]["bin"])
-    initcode += datacontract_initcode_prefix.ljust(32, b'\0')
-    print(initcode)
+    initcode = compile_sol("src/hex0.sol", "hex0")
     address, _ = boa.env.deploy_code(bytecode=initcode)
     return address
 
+def deploy_hex2():
+    initcode = compile_sol("src/hex2.sol", "hex2")
+    address, _ = boa.env.deploy_code(bytecode=initcode)
+    return address
+
+def compile_sol(src, contract_name):
+    datacontract_initcode_prefix = load_datacontract_initcode_prefix()
+    data = json.loads(subprocess.run(
+        ("solc", "--combined-json=bin", src),
+        check=True,
+        stdout=subprocess.PIPE,
+    ).stdout)
+    return bytes.fromhex(data["contracts"][f"{src}:{contract_name}"]["bin"])
+
 def moccasin_main():
-    return deploy()
+    deploy_hex0()
+    deploy_hex2()

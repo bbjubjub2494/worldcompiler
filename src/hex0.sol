@@ -2,12 +2,6 @@
 pragma solidity ^0.8.0;
 
 contract hex0 {
-    bytes11 private immutable datacontractInitcodePrefix;
-    
-    constructor(bytes11 _datacontractInitcodePrefix) {
-        datacontractInitcodePrefix = _datacontractInitcodePrefix;
-    }
-    
     fallback(bytes calldata input) external returns (bytes memory output) {
         uint256 i = 0;
         bool toggle = false;

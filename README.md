@@ -1,4 +1,4 @@
-# Moccasin Project
+# ethbootstrap
 
 🐍 Welcome to your Moccasin project!
 

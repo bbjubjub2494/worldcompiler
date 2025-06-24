@@ -1,5 +1,5 @@
 import pytest
-from script.deploy import deploy_hex0
+from script.deploy import deploy_hex0, deploy_hex2
 import src
 import boa
 from boa.util.abi import Address, abi_decode
@@ -7,6 +7,10 @@ from boa.util.abi import Address, abi_decode
 @pytest.fixture
 def hex0_contract():
     return deploy_hex0()
+
+@pytest.fixture
+def hex2_contract():
+    return deploy_hex2()
 
 @pytest.fixture
 def datacontract_initcode_prefix():
