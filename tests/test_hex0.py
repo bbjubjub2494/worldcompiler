@@ -14,8 +14,11 @@ HEX0_TESTCASES = [
 
 HEX2_TESTCASES = HEX0_TESTCASES + [
     (":label 00", b"\x00"),
-    ("a :label b", b"\xab"), # note: this should not work since the label is not aligned
+    ("a :label b", b"\xab"), # note: maybe this should not work since the label is not aligned
     ("cdef :something", b"\xcd\xef"),
+    (":a ab +a", b"\xab\x00"),
+    ("ab :label +label", b"\xab\x01"),
+    ("ab +label :label", b"\xab\x02"),
 ]
 
 
