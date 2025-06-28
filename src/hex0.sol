@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 contract hex0 {
-    fallback(bytes calldata input) external returns (bytes memory output) {
+    fallback(bytes calldata) external returns (bytes memory) {
 	    assembly {
 	    // Main entry point
             
@@ -15,9 +15,8 @@ contract hex0 {
             let hold := 0       // Holds the high nibble
             
             // Main decode loop
-            for {} lt(i, calldatasize()) {} {
+            for {} lt(i, calldatasize()) {i := add(i, 1)} {
                 let v := byte(0, calldataload(i))
-                i := add(i, 1)
                 
                 let nibble_value := 0
                 let is_valid_hex := 0
@@ -43,9 +42,8 @@ contract hex0 {
                 // Check for comment characters ';' (59) or '#' (35)
                 if or(eq(v, 59), eq(v, 35)) {
                     // Skip to end of line
-                    for {} lt(i, calldatasize()) {} {
+                    for {i := add(i, 1)} lt(i, calldatasize()) {i := add(i, 1)} {
                         let comment_char := byte(0, calldataload(i))
-                        i := add(i, 1)
                         
                         // Break on '\r' (13) or '\n' (10)
                         if or(eq(comment_char, 13), eq(comment_char, 10)) {

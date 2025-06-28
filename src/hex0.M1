@@ -1,0 +1,79 @@
+;; This creation code implements hex0: a minimal hex decoder used for bootstrapping.
+
+;; STACK LAYOUT
+;; [0] toggle
+;; [1] hold
+;; [2] j
+;; [3] i
+;; [4] c, n, b
+
+:start
+PUSH0
+PUSH0
+PUSH0
+PUSH0
+
+:loop
+CALLDATASIZE
+DUP2
+LT
+ISZERO
+PUSH1 !endloop>start
+JUMPI ; if i >= calldatasize
+
+DUP1
+CALLDATALOAD
+PUSH0
+BYTE ; c = byte(calldata[i])
+
+DUP1
+PUSH1 61
+GT
+DUP2
+PUSH1 66
+LT
+OR
+PUSH1 !skip1>start
+JUMPI ; if 'a' > c || 'f' < c
+
+PUSH1 57
+SUB ; n = c - 'a' + 10
+
+DUP5
+PUSH1 !toggle>start
+JUMPI
+
+PUSH1 04
+SHL
+SWAP3
+POP ; hold = n << 4
+
+PUSH1 !start>after_toggle
+JUMP
+
+:toggle
+
+DUP4
+OR ; b := hold | n
+
+
+DUP3
+MSTORE8 ; mem[j] = v
+SWAP1
+PUSH1 01
+ADD
+SWAP1
+
+SWAP3
+ISZERO
+SWAP3 ; toggle = !toggle
+
+:skip1
+
+PUSH1 01
+ADD ; i++
+
+PUSH1 !loop>start
+JUMP
+
+:endloop
