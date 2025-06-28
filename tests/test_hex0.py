@@ -21,17 +21,18 @@ HEX2_TESTCASES = HEX0_TESTCASES + [
     ("ab +label :label", b"\xab\x02"),
 ]
 
-
 def test_hex0(hex0_contract):
     for input_str, expected_output in HEX0_TESTCASES:
+        gas_pre = boa.env.get_gas_used()
         r = boa.env.raw_call(to_address=hex0_contract, data=input_str.encode())
+        gas_post = boa.env.get_gas_used()
         assert r.is_success
         assert r.output == expected_output
+        print(input_str, expected_output, gas_post - gas_pre)
 
 def test_hex2(hex2_contract):
     for input_str, expected_output in HEX2_TESTCASES:
         with boa.env.anchor():
             r = boa.env.raw_call(to_address=hex2_contract, data=input_str.encode())
             assert r.is_success
-            print(r.output, expected_output)
             assert r.output == expected_output
