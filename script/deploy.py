@@ -22,6 +22,11 @@ def deploy_hex2():
     address, _ = boa.env.deploy_code(bytecode=initcode)
     return address
 
+def deploy_M1():
+    initcode = compile_sol("src/M1.sol", "M1")
+    address, _ = boa.env.deploy_code(bytecode=initcode)
+    return address
+
 def compile_sol(src, contract_name):
     datacontract_initcode_prefix = load_datacontract_initcode_prefix()
     data = json.loads(subprocess.run(
@@ -34,3 +39,4 @@ def compile_sol(src, contract_name):
 def moccasin_main():
     deploy_hex0()
     deploy_hex2()
+    deploy_M1()

@@ -30,6 +30,9 @@ def test_hex0(hex0_contract):
         assert r.is_success
         assert r.output == expected_output
 
+
+# FIXME should be its own file or this onte shoul be renamed to unit tests
+# thingy
 def test_hex2(hex2_contract):
     for input_str, expected_output in HEX2_TESTCASES:
         with boa.env.anchor():
