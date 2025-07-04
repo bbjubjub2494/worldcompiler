@@ -8,9 +8,9 @@ HEX0_TESTCASES = [
     ("98", b"98"),
     (" AB", b"AB"),
     ("xAB", b"xAB"),
-    ("ab # comment\n cd", b"abcd"),
+    ("ab # comment\n cd", b"ab cd"),
     ("ABCD", b"ABCD"),
-    ("AB CD EF # comment", b"ABCDEF"),
+    ("AB CD EF # comment", b"AB CD EF"),
 ]
 
 HEX2_TESTCASES = HEX0_TESTCASES + [

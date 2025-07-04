@@ -34,17 +34,26 @@ contract M1 {
 
     function parse(bytes calldata input) internal returns (bytes memory output) {
         ParserState memory state;
+        bool first_output = true;
         
         for (next_token(state, input); state.tok != TOK_EOF; next_token(state, input)) {
             if (state.tok == TOK_single_quote) {
                 // Handle single-quoted literal strings
                 bytes memory literal = read_single_quoted_string(state, input);
+                if (!first_output) {
+                    output = bytes.concat(output, " ");
+                }
                 output = bytes.concat(output, literal);
+                first_output = false;
             } else if (state.tok == TOK_double_quote) {
                 // Handle double-quoted hex-encoded strings
                 bytes memory hex_string = read_double_quoted_string(state, input);
                 bytes memory encoded = hex_encode(hex_string);
+                if (!first_output) {
+                    output = bytes.concat(output, " ");
+                }
                 output = bytes.concat(output, encoded);
+                first_output = false;
             } else if (is_define_token(state, input)) {
                 // Handle DEFINE statements
                 handle_define(state, input);
@@ -52,7 +61,11 @@ contract M1 {
                 // Handle atoms (including special atoms and defined names)
                 bytes memory atom = read_atom(state, input);
                 bytes memory resolved = resolve_atom(atom);
+                if (!first_output) {
+                    output = bytes.concat(output, " ");
+                }
                 output = bytes.concat(output, resolved);
+                first_output = false;
             }
         }
         
