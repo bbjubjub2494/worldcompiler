@@ -1,7 +1,6 @@
 struct ParserState {
     uint256 next_offset;
     uint256 tok; // first byte of token or EOF
-    bytes32 token_hash;
 }
 
 uint256 constant TOK_EOF = 0x100;
@@ -102,6 +101,7 @@ contract M1 {
         // Handle atoms (including special atoms starting with special characters)
         if (is_atom_start(c)) {
             state.tok = c;
+            // Keep next_offset pointing to the start of the atom so read_atom can read it completely
             return;
         }
         
@@ -184,7 +184,7 @@ contract M1 {
                 uint8(input[start + 3]) == 73 && // 'I'
                 uint8(input[start + 4]) == 78 && // 'N'
                 uint8(input[start + 5]) == 69 && // 'E'
-                (start + 6 >= input.length || is_whitespace(uint8(input[start + 6]))));
+                (start + 6 >= input.length || is_whitespace(uint8(input[start + 6])) || !is_atom_char(uint8(input[start + 6]))));
     }
 
     function handle_define(ParserState memory state, bytes calldata input) internal {
@@ -278,7 +278,7 @@ contract M1 {
     }
 
     function is_special_char(uint8 c) internal pure returns (bool) {
-        return c == 43 || c == 58 || c == 45 || c == 95; // '+', ':', '-', '_'
+        return c == 43 || c == 58 || c == 45 || c == 95 || c == 33 || c == 64 || c == 35 || c == 36 || c == 37 || c == 94 || c == 38 || c == 42; // '+', ':', '-', '_', '!', '@', '#', '
     }
 
     function tstore(bytes32 key, uint256 value) internal {
