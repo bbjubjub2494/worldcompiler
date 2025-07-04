@@ -1,12 +1,19 @@
-from src import load_datacontract_initcode_prefix
+from src import load_datacontract_initcode_prefix, load_hex0
 
 import boa
 
 import json
 import subprocess
 
-def deploy_hex0():
+def deploy_hex0_ref():
     initcode = compile_sol("src/hex0.sol", "hex0")
+    address, _ = boa.env.deploy_code(bytecode=initcode)
+    return address
+
+def deploy_hex0():
+    code = load_hex0()
+    datacontract_initcode_prefix = load_datacontract_initcode_prefix()
+    initcode = datacontract_initcode_prefix + code
     address, _ = boa.env.deploy_code(bytecode=initcode)
     return address
 

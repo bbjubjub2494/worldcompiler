@@ -14,11 +14,13 @@ PUSH0
 PUSH0
 
 :loop
+JUMPDEST
+
 CALLDATASIZE
 DUP2
 LT
 ISZERO
-PUSH1 !endloop>start
+PUSH1 +endloop
 JUMPI ; if i >= calldatasize
 
 DUP1
@@ -27,53 +29,161 @@ PUSH0
 BYTE ; c = byte(calldata[i])
 
 DUP1
-PUSH1 61
+PUSH1 '61'
 GT
 DUP2
-PUSH1 66
+PUSH1 '66'
 LT
 OR
-PUSH1 !skip1>start
+PUSH1 +notlower
 JUMPI ; if 'a' > c || 'f' < c
 
-PUSH1 57
+PUSH1 '57'
+SWAP1
 SUB ; n = c - 'a' + 10
+PUSH1 +nibble
+JUMP
+
+:notlower
+JUMPDEST
+
+DUP1
+PUSH1 '41'
+GT
+DUP2
+PUSH1 '46'
+LT
+OR
+PUSH1 +notupper
+JUMPI ; if 'A' > c || 'F' < c
+
+PUSH1 '37'
+SWAP1
+SUB ; n = c - 'A' + 10
+PUSH1 +nibble
+JUMP
+
+:notupper
+JUMPDEST
+
+DUP1
+PUSH1 '30'
+GT
+DUP2
+PUSH1 '39'
+LT
+OR
+PUSH1 +notnumber
+JUMPI ; if '0' > c || '9' < c
+
+PUSH1 '30'
+SWAP1
+SUB ; n = c - '0'
+PUSH1 +nibble
+JUMP
+
+:notnumber
+JUMPDEST
+
+DUP1
+PUSH1 '3B'
+EQ
+DUP2
+PUSH1 '23'
+EQ
+OR
+PUSH1 +comment
+JUMPI ; if c == ';" || c == '#'
+
+POP
+PUSH1 +next
+JUMP
+
+:comment
+JUMPDEST
+POP
+
+:commentloop
+JUMPDEST
+PUSH1 '01'
+ADD ; i++
+
+CALLDATASIZE
+DUP2
+LT
+ISZERO
+PUSH1 +endcommentloop
+JUMPI ; if i >= calldatasize
+
+DUP1
+CALLDATALOAD
+PUSH0
+BYTE ; c = byte(calldata[i])
+
+DUP1
+PUSH1 '0a'
+EQ
+SWAP1
+PUSH1 '0d'
+EQ
+OR
+ISZERO
+PUSH1 +commentloop
+JUMPI ; if !(c == '\n" || c == '\r')
+
+:endcommentloop
+JUMPDEST
+PUSH1 +next
+JUMP
+
+:nibble
+JUMPDEST
 
 DUP5
-PUSH1 !toggle>start
-JUMPI
+PUSH1 +toggle
+JUMPI ; if toggle
 
-PUSH1 04
+PUSH1 '04'
 SHL
 SWAP3
 POP ; hold = n << 4
 
-PUSH1 !start>after_toggle
+PUSH1 +after_toggle
 JUMP
 
 :toggle
+JUMPDEST
 
 DUP4
 OR ; b := hold | n
 
-
 DUP3
 MSTORE8 ; mem[j] = v
+
 SWAP1
-PUSH1 01
+PUSH1 '01'
 ADD
-SWAP1
+SWAP1 ; j++
+
+:after_toggle
+JUMPDEST
 
 SWAP3
 ISZERO
 SWAP3 ; toggle = !toggle
 
-:skip1
+:next
+JUMPDEST
 
-PUSH1 01
+PUSH1 '01'
 ADD ; i++
 
-PUSH1 !loop>start
+PUSH1 +loop
 JUMP
 
 :endloop
+JUMPDEST
+
+SWAP1
+PUSH0
+RETURN ; return mem[0:j]

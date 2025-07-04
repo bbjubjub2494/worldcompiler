@@ -13,7 +13,14 @@
     devShells = inputs.nixpkgs.lib.genAttrs systems (system:
       with inputs.nixpkgs.legacyPackages.${system}; {
         default = mkShell {packages = [
-          mescc-tools # hex2, M1
+          (mescc-tools.overrideAttrs { # hex2, M1
+            patches = [
+              (fetchpatch {
+                url = "https://github.com/bbjubjub2494/mescc-tools/commit/e5658f211d1dbcbfcd173cf397ebc08fa89d150b.patch";
+                hash = "sha256-lecU4ozYH8aP/GDwJrj6HCnKaWZsaZrBKjLuu40bMaw=";
+              })
+            ];
+          })
           solc # Solidity compiler
         ];
       };

@@ -1,30 +1,35 @@
 import subprocess
 from pathlib import Path
-import tempfile
 
 def load_datacontract_initcode_prefix():
     # FIXME: hardcoded path
-    r = subprocess.run(
-        ("hex2", "-f", "src/datacontract_initcode_prefix.hex2"),
-        check=True,
-        stdout=subprocess.PIPE,
-    )
-    return r.stdout
+    f = compile_hex2("src/datacontract_initcode_prefix.hex2")
+    return f.read_bytes()
 
 def load_inputaddressed_initcode_template():
-    return compile_M2("src/inputaddressed_initcode_template.M1")
+    f = compile_M1("src/inputaddressed_initcode_template.M1")
+    f = compile_hex2(f)
+    return f.read_bytes()
 
-def compile_M2(src):
+def load_hex0():
+    f = compile_M1("src/hex0.M1")
+    f = compile_hex2(f)
+    return f.read_bytes()
+
+def compile_M1(src):
     src = Path(src)
-    with tempfile.NamedTemporaryFile(
-        prefix=f".{src.stem}", suffix='.hex2', dir=src.parent
-    ) as tmp_hex2:
-        subprocess.run(
-            ("M1", "-f", "src/evm_defs.M1", "-f", src, "-o", tmp_hex2.name),
-            check=True,
-        )
-        return subprocess.run(
-            ("hex2", "-f", tmp_hex2.name),
-            check=True,
-            stdout=subprocess.PIPE,
-        ).stdout
+    dst = Path(f"build/{src.stem}.hex2")
+    subprocess.run(
+        ("M1", "-f", "src/evm_defs.M1", "-f", src, "-o", dst),
+        check=True,
+    )
+    return dst
+
+def compile_hex2(src):
+    src = Path(src)
+    dst = Path(f"build/{src.stem}.bin")
+    subprocess.run(
+        ("hex2", "-f", src, "-o", dst),
+        check=True,
+    )
+    return dst
