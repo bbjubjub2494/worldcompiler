@@ -135,7 +135,7 @@ contract M1 {
             i++; // Skip closing quote
         }
         
-        bytes memory result = bytes.concat("'", input[start:i-1], "'");
+        bytes memory result = input[start:i-1];
         state.next_offset = i;
         return result;
     }

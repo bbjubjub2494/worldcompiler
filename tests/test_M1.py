@@ -17,9 +17,12 @@ HEX2_TESTCASES = HEX0_TESTCASES + [
     (":label 00", b":label 00"),
     ("a :label b", b"a :label b"),
     ("cdef :something", b"cdef :something"),
-    (":a ab +a", b"a ab +a"),
-    ("ab :label +label", "ab :label +label"),
-    ("ab +label :label", "ab +label :label"),
+    (":a ab +a", b":a ab +a"),
+    ("ab :label +label", b"ab :label +label"),
+    ("ab +label :label", b"ab +label :label"),
+    ("ab '00 00 00 30'", b"ab 00 00 00 30"),
+    ('ab "AB EF"', b"ab 4142204546"),
+    ('DEFINE AB CD AB', b"CD"),
 ]
 
 def test_M1(M1_contract):
