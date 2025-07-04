@@ -26,7 +26,6 @@ def test_hex0(hex0_contract):
         gas_pre = boa.env.get_gas_used()
         r = boa.env.raw_call(to_address=hex0_contract, data=input_str.encode())
         gas_post = boa.env.get_gas_used()
-        print(boa.env.get_code(hex0_contract).hex())
         print(input_str, r.output, expected_output, gas_post - gas_pre)
         assert r.is_success
         assert r.output == expected_output

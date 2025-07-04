@@ -1,7 +1,6 @@
 {
   inputs.nixpkgs.url = "github:NixOS/nixpkgs?ref=nixpkgs-unstable";
 
-  # Load the blueprint
   outputs = inputs: let
     systems = [
       "x86_64-linux"

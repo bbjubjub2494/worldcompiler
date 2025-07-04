@@ -8,5 +8,4 @@ def test_compile_hex0(hex2_contract):
     expected_output = (build/"hex0.bin").read_bytes()
     r = boa.env.raw_call(to_address=hex2_contract, data=input_str.encode())
     assert r.is_success
-    breakpoint()
     assert r.output == expected_output

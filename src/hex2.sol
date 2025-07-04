@@ -99,7 +99,7 @@ function next_token(ParserState memory state, bytes calldata input) pure {
             uint256 label_start = i + 1;
             for (i++; i < input.length; i++) {
                 c = uint8(input[i]);
-                if (c < 97 || c > 122) {
+                if ((c < 97 || c > 122) && c != 95) {
                     // not 'a' to 'z'
                     break;
                 }
@@ -114,7 +114,7 @@ function next_token(ParserState memory state, bytes calldata input) pure {
             uint256 label_start = i + 1;
             for (i++; i < input.length; i++) {
                 c = uint8(input[i]);
-                if (c < 97 || c > 122) {
+                if ((c < 97 || c > 122) && c != 95) {
                     // not 'a' to 'z'
                     break;
                 }
