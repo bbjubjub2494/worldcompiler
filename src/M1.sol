@@ -198,20 +198,19 @@ contract M1 {
         // Store in transient storage
         bytes32 name_hash = keccak256(name);
         bytes32 value_hash = keccak256(value);
-        tstore(name_hash, uint256(value_hash));
+        tstore(name_hash, value_hash);
         tstore(value_hash, bytes32(value));
     }
 
     function resolve_atom(bytes memory atom) internal view returns (bytes memory) {
         bytes32 atom_hash = keccak256(atom);
-        uint256 value_hash_uint = tload(atom_hash);
+        bytes32 value_hash = tload(atom_hash);
         
-        if (value_hash_uint == 0) {
+        if (value_hash == bytes32(0)) {
             // Not defined, return as-is
             return atom;
         }
         
-        bytes32 value_hash = bytes32(value_hash_uint);
         bytes32 stored_value = tload(value_hash);
         
         // Convert back to bytes
@@ -281,7 +280,7 @@ contract M1 {
         }
     }
 
-    function tload(bytes32 key) internal view returns (uint256 value) {
+    function tload(bytes32 key) internal view returns (bytes32 value) {
         assembly {
             value := tload(key)
         }
