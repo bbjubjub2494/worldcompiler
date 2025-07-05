@@ -41,7 +41,7 @@ contract M1 {
     function parse(bytes calldata input) internal returns (bytes memory output) {
         ParserState memory state;
         bool first_output = true;
-        
+
         for (next_token(state, input); state.tok != TOK_EOF; next_token(state, input)) {
             if (state.tok == TOK_single_quote) {
                 // Handle single-quoted literal strings
@@ -74,61 +74,61 @@ contract M1 {
                 first_output = false;
             }
         }
-        
+
         return output;
     }
 
     function next_token(ParserState memory state, bytes calldata input) internal pure {
         // Skip whitespace
-	for (uint256 i = state.next_offset; i < input.length; i++) {
-		uint8 c = uint8(input[i]);
-        if (c == TOK_hash || c == TOK_semicolon) {
-            // comments: skip to end of line
-            for (i++; i < input.length; i++) {
-                c = uint8(input[i]);
-                if (c == 13 || c == 10) {
-                    // '\r' or '\n'
-                    break;
+        for (uint256 i = state.next_offset; i < input.length; i++) {
+            uint8 c = uint8(input[i]);
+            if (c == TOK_hash || c == TOK_semicolon) {
+                // comments: skip to end of line
+                for (i++; i < input.length; i++) {
+                    c = uint8(input[i]);
+                    if (c == 13 || c == 10) {
+                        // '\r' or '\n'
+                        break;
+                    }
                 }
-            }
-        } else if (c == TOK_single_quote || c == TOK_double_quote) {
-            state.tok = c;
-            state.start_offset = i + 1;
-            for (i++; i < input.length; i++) {
-                c = uint8(input[i]);
-                if (c == state.tok) {
-                    break;
+            } else if (c == TOK_single_quote || c == TOK_double_quote) {
+                state.tok = c;
+                state.start_offset = i + 1;
+                for (i++; i < input.length; i++) {
+                    c = uint8(input[i]);
+                    if (c == state.tok) {
+                        break;
+                    }
                 }
-            }
-	    state.end_offset = i;
-	    state.next_offset = i + 1;
-	    return;
-        } else if (is_atom_start(c)) {
-            state.tok = c;
-            state.start_offset = i;
-            for (i++; i < input.length; i++) {
-                c = uint8(input[i]);
-                if (is_whitespace(c)) {
-                    break;
+                state.end_offset = i;
+                state.next_offset = i + 1;
+                return;
+            } else if (is_atom_start(c)) {
+                state.tok = c;
+                state.start_offset = i;
+                for (i++; i < input.length; i++) {
+                    c = uint8(input[i]);
+                    if (is_whitespace(c)) {
+                        break;
+                    }
                 }
-	    }
-		state.end_offset = i;
-	    	state.next_offset = i;
-		return;
+                state.end_offset = i;
+                state.next_offset = i;
+                return;
             }
-	    // ignore other characters
-	}
-	state.tok = TOK_EOF;
+            // ignore other characters
+        }
+        state.tok = TOK_EOF;
     }
 
     function is_define_token(ParserState memory state, bytes calldata input) internal pure returns (bool) {
         uint256 start = state.start_offset;
         uint256 end = state.end_offset;
-        
+
         if (start + 6 != end) {
-	    return false; // Not enough characters for "DEFINE"
-	}
-        
+            return false; // Not enough characters for "DEFINE"
+        }
+
         return bytes6(input[start:end]) == bytes6("DEFINE");
     }
 
@@ -136,10 +136,10 @@ contract M1 {
         next_token(state, input);
         bytes memory name = input[state.start_offset:state.end_offset];
         bytes32 name_hash = keccak256(name);
-        
+
         next_token(state, input);
-        bytes memory value =  input[state.start_offset:state.end_offset];
-        
+        bytes memory value = input[state.start_offset:state.end_offset];
+
         tstore(name_hash, bytes32(value));
     }
 
@@ -147,41 +147,41 @@ contract M1 {
         bytes32 atom_hash = keccak256(atom);
         bytes32 value = tload(atom_hash);
 
-	if (value == bytes32(0)) {
-	    // not defined
-	    return atom;
-	}
-        
+        if (value == bytes32(0)) {
+            // not defined
+            return atom;
+        }
+
         // Convert back to bytes
         bytes memory result = new bytes(32);
         assembly {
             mstore(add(result, 0x20), value)
         }
-        
+
         // Find actual length by looking for null terminator
         uint256 actual_length = 0;
         for (uint256 i = 0; i < 32; i++) {
             if (result[i] == 0) break;
             actual_length++;
         }
-        
+
         // Resize to actual length
         assembly {
             mstore(result, actual_length)
         }
-        
+
         return result;
     }
 
     function hex_encode(bytes memory input) internal pure returns (bytes memory) {
         bytes memory result = new bytes(input.length * 2);
         bytes memory alphabet = "0123456789abcdef";
-        
+
         for (uint256 i = 0; i < input.length; i++) {
             result[i * 2] = alphabet[uint8(input[i]) >> 4];
             result[i * 2 + 1] = alphabet[uint8(input[i]) & 0x0f];
         }
-        
+
         return result;
     }
 
@@ -198,9 +198,7 @@ contract M1 {
     }
 
     function is_alphanumeric(uint8 c) internal pure returns (bool) {
-        return (c >= TOK_0 && c <= TOK_9) || 
-               (c >= TOK_A && c <= TOK_Z) || 
-               (c >= TOK_a && c <= TOK_z);
+        return (c >= TOK_0 && c <= TOK_9) || (c >= TOK_A && c <= TOK_Z) || (c >= TOK_a && c <= TOK_z);
     }
 
     function is_special_char(uint8 c) internal pure returns (bool) {
