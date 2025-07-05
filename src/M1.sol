@@ -1,5 +1,7 @@
 struct ParserState {
     uint256 next_offset;
+    uint256 start_offset; // start of token content
+    uint256 end_offset; // end of token content
     uint256 tok; // first byte of token or EOF
 }
 
@@ -38,7 +40,7 @@ contract M1 {
         for (next_token(state, input); state.tok != TOK_EOF; next_token(state, input)) {
             if (state.tok == TOK_single_quote) {
                 // Handle single-quoted literal strings
-                bytes memory literal = read_single_quoted_string(state, input);
+                bytes memory literal = input[state.start_offset:state.end_offset];
                 if (!first_output) {
                     output = bytes.concat(output, " ");
                 }
@@ -46,7 +48,7 @@ contract M1 {
                 first_output = false;
             } else if (state.tok == TOK_double_quote) {
                 // Handle double-quoted hex-encoded strings
-                bytes memory hex_string = read_double_quoted_string(state, input);
+                bytes memory hex_string = input[state.start_offset:state.end_offset];
                 bytes memory encoded = hex_encode(hex_string);
                 if (!first_output) {
                     output = bytes.concat(output, " ");
@@ -58,7 +60,7 @@ contract M1 {
                 handle_define(state, input);
             } else if (is_atom_start(uint8(state.tok))) {
                 // Handle atoms (including special atoms and defined names)
-                bytes memory atom = read_atom(state, input);
+                bytes memory atom = input[state.start_offset:state.end_offset];
                 bytes memory resolved = resolve_atom(atom);
                 if (!first_output) {
                     output = bytes.concat(output, " ");
@@ -73,107 +75,49 @@ contract M1 {
 
     function next_token(ParserState memory state, bytes calldata input) internal pure {
         // Skip whitespace
-        while (state.next_offset < input.length && is_whitespace(uint8(input[state.next_offset]))) {
-            state.next_offset++;
-        }
-        
-        if (state.next_offset >= input.length) {
-            state.tok = TOK_EOF;
-            return;
-        }
-        
-        uint8 c = uint8(input[state.next_offset]);
-        
-        // Handle comments
+	for (uint256 i = state.next_offset; i < input.length; i++) {
+		uint8 c = uint8(input[i]);
         if (c == TOK_hash || c == TOK_semicolon) {
-            skip_comment(state, input);
-            next_token(state, input); // Recursively get next token after comment
-            return;
-        }
-        
-        // Handle strings
-        if (c == TOK_single_quote || c == TOK_double_quote) {
-            state.tok = c;
-            state.next_offset++;
-            return;
-        }
-        
-        // Handle atoms (including special atoms starting with special characters)
-        if (is_atom_start(c)) {
-            state.tok = c;
-            // Keep next_offset pointing to the start of the atom so read_atom can read it completely
-            return;
-        }
-        
-        // Skip unknown characters
-        state.next_offset++;
-        next_token(state, input);
-    }
-
-    function skip_comment(ParserState memory state, bytes calldata input) internal pure {
-        // Skip until end of line
-        for (uint256 i = state.next_offset + 1; i < input.length; i++) {
-            uint8 c = uint8(input[i]);
-            if (c == TOK_newline || c == TOK_carriage_return) {
-                state.next_offset = i + 1;
-                return;
+            // comments: skip to end of line
+            for (i++; i < input.length; i++) {
+                c = uint8(input[i]);
+                if (c == 13 || c == 10) {
+                    // '\r' or '\n'
+                    break;
+                }
             }
-        }
-        state.next_offset = input.length;
-    }
-
-    function read_single_quoted_string(ParserState memory state, bytes calldata input) internal pure returns (bytes memory) {
-        uint256 start = state.next_offset;
-        uint256 i = start;
-        
-        // Find closing quote
-        while (i < input.length && uint8(input[i]) != TOK_single_quote) {
-            i++;
-        }
-        
-        if (i < input.length) {
-            i++; // Skip closing quote
-        }
-        
-        bytes memory result = input[start:i-1];
-        state.next_offset = i;
-        return result;
-    }
-
-    function read_double_quoted_string(ParserState memory state, bytes calldata input) internal pure returns (bytes memory) {
-        uint256 start = state.next_offset;
-        uint256 i = start;
-        
-        // Find closing quote
-        while (i < input.length && uint8(input[i]) != TOK_double_quote) {
-            i++;
-        }
-        
-        if (i < input.length) {
-            i++; // Skip closing quote
-        }
-        
-        bytes memory content = input[start:i-1];
-        state.next_offset = i;
-        return content;
-    }
-
-    function read_atom(ParserState memory state, bytes calldata input) internal pure returns (bytes memory) {
-        uint256 start = state.next_offset;
-        uint256 i = start;
-        
-        // Read atom characters
-        while (i < input.length && is_atom_char(uint8(input[i]))) {
-            i++;
-        }
-        
-        bytes memory atom = input[start:i];
-        state.next_offset = i;
-        return atom;
+        } else if (c == TOK_single_quote || c == TOK_double_quote) {
+            state.tok = c;
+            state.start_offset = i + 1;
+            for (i++; i < input.length; i++) {
+                c = uint8(input[i]);
+                if (c == state.tok) {
+                    break;
+                }
+            }
+	    state.end_offset = i;
+	    state.next_offset = i + 1;
+	    return;
+        } else if (is_atom_start(c)) {
+            state.tok = c;
+            state.start_offset = i;
+            for (i++; i < input.length; i++) {
+                c = uint8(input[i]);
+                if (is_whitespace(c)) {
+                    break;
+                }
+	    }
+		state.end_offset = i;
+	    	state.next_offset = i;
+		return;
+            }
+	    // ignore other characters
+	}
+	state.tok = TOK_EOF;
     }
 
     function is_define_token(ParserState memory state, bytes calldata input) internal pure returns (bool) {
-        uint256 start = state.next_offset;
+        uint256 start = state.start_offset;
         
         // Check if we have "DEFINE"
         if (start + 6 > input.length) return false;
@@ -188,25 +132,13 @@ contract M1 {
     }
 
     function handle_define(ParserState memory state, bytes calldata input) internal {
-        // Skip "DEFINE"
-        state.next_offset += 6;
-        
         // Get name
         next_token(state, input);
-        bytes memory name = read_atom(state, input);
+        bytes memory name = input[state.start_offset:state.end_offset];
         
         // Get value
         next_token(state, input);
-        bytes memory value;
-        
-        if (state.tok == TOK_single_quote) {
-            value = read_single_quoted_string(state, input);
-        } else if (state.tok == TOK_double_quote) {
-            bytes memory content = read_double_quoted_string(state, input);
-            value = hex_encode(content);
-        } else {
-            value = read_atom(state, input);
-        }
+        bytes memory value =  input[state.start_offset:state.end_offset];
         
         // Store in transient storage
         bytes32 name_hash = keccak256(name);
