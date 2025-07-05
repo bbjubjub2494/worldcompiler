@@ -30,5 +30,4 @@ def test_M1(M1_contract):
         with boa.env.anchor():
             r = boa.env.raw_call(to_address=M1_contract, data=input_str.encode())
             assert r.is_success
-            print(input_str, r.output, expected_output)
             assert r.output == expected_output

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
 struct ParserState {
     uint256 next_offset;
     uint256 start_offset; // start of token content
@@ -14,6 +17,8 @@ uint8 constant TOK_space = 32; // ' '
 uint8 constant TOK_tab = 9; // '\t'
 uint8 constant TOK_newline = 10; // '\n'
 uint8 constant TOK_carriage_return = 13; // '\r'
+uint8 constant TOK_plus = 43; // '+'
+uint8 constant TOK_colon = 58; // ':'
 
 uint8 constant TOK_0 = 48; // '0'
 uint8 constant TOK_9 = 57; // '9'
@@ -118,50 +123,39 @@ contract M1 {
 
     function is_define_token(ParserState memory state, bytes calldata input) internal pure returns (bool) {
         uint256 start = state.start_offset;
+        uint256 end = state.end_offset;
         
-        // Check if we have "DEFINE"
-        if (start + 6 > input.length) return false;
+        if (start + 6 != end) {
+	    return false; // Not enough characters for "DEFINE"
+	}
         
-        return (uint8(input[start]) == 68 && // 'D'
-                uint8(input[start + 1]) == 69 && // 'E'
-                uint8(input[start + 2]) == 70 && // 'F'
-                uint8(input[start + 3]) == 73 && // 'I'
-                uint8(input[start + 4]) == 78 && // 'N'
-                uint8(input[start + 5]) == 69 && // 'E'
-                (start + 6 >= input.length || is_whitespace(uint8(input[start + 6])) || !is_atom_char(uint8(input[start + 6]))));
+        return bytes6(input[start:end]) == bytes6("DEFINE");
     }
 
     function handle_define(ParserState memory state, bytes calldata input) internal {
-        // Get name
         next_token(state, input);
         bytes memory name = input[state.start_offset:state.end_offset];
+        bytes32 name_hash = keccak256(name);
         
-        // Get value
         next_token(state, input);
         bytes memory value =  input[state.start_offset:state.end_offset];
         
-        // Store in transient storage
-        bytes32 name_hash = keccak256(name);
-        bytes32 value_hash = keccak256(value);
-        tstore(name_hash, value_hash);
-        tstore(value_hash, bytes32(value));
+        tstore(name_hash, bytes32(value));
     }
 
     function resolve_atom(bytes memory atom) internal view returns (bytes memory) {
         bytes32 atom_hash = keccak256(atom);
-        bytes32 value_hash = tload(atom_hash);
-        
-        if (value_hash == bytes32(0)) {
-            // Not defined, return as-is
-            return atom;
-        }
-        
-        bytes32 stored_value = tload(value_hash);
+        bytes32 value = tload(atom_hash);
+
+	if (value == bytes32(0)) {
+	    // not defined
+	    return atom;
+	}
         
         // Convert back to bytes
         bytes memory result = new bytes(32);
         assembly {
-            mstore(add(result, 0x20), stored_value)
+            mstore(add(result, 0x20), value)
         }
         
         // Find actual length by looking for null terminator
@@ -210,13 +204,7 @@ contract M1 {
     }
 
     function is_special_char(uint8 c) internal pure returns (bool) {
-        return c == 43 || c == 58 || c == 45 || c == 95 || c == 33 || c == 64 || c == 35 || c == 36 || c == 37 || c == 94 || c == 38 || c == 42; // '+', ':', '-', '_', '!', '@', '#', '
-    }
-
-    function tstore(bytes32 key, uint256 value) internal {
-        assembly {
-            tstore(key, value)
-        }
+        return c == TOK_plus || c == TOK_colon;
     }
 
     function tstore(bytes32 key, bytes32 value) internal {
