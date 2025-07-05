@@ -4,9 +4,9 @@ import boa
 
 def test_M1_compile_hex0(hex2_contract, M1_contract):
     build = Path("build")
-    src = Path("src")
+    contracts = Path("contracts")
 
-    input_bytes = (src/"evm_defs.M1").read_bytes() + (src/"hex0.M1").read_bytes()
+    input_bytes = (contracts/"evm_defs.M1").read_bytes() + (contracts/"hex0.M1").read_bytes()
     r = boa.env.raw_call(to_address=M1_contract, data=input_bytes)
     assert r.is_success
 

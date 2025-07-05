@@ -1,6 +1,6 @@
 import pytest
 from script.deploy import deploy_hex0, deploy_hex2, deploy_M1
-import src
+import contracts
 import boa
 from boa.util.abi import Address, abi_decode
 
@@ -18,11 +18,11 @@ def M1_contract():
 
 @pytest.fixture
 def datacontract_initcode_prefix():
-    return src.load_datacontract_initcode_prefix()
+    return contracts.load_datacontract_initcode_prefix()
 
 @pytest.fixture
 def inputaddressed_initcode_template():
-    return src.load_inputaddressed_initcode_template()
+    return contracts.load_inputaddressed_initcode_template()
 
 class ERC7955Factory:
     def __init__(self, address):
