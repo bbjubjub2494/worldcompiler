@@ -140,36 +140,82 @@ contract M1 {
         next_token(state, input);
         bytes memory value = input[state.start_offset:state.end_offset];
 
-        tstore(name_hash, bytes32(value));
+        store_bytes_in_transient(name_hash, value);
     }
 
     function resolve_atom(bytes memory atom) internal view returns (bytes memory) {
         bytes32 atom_hash = keccak256(atom);
-        bytes32 value = tload(atom_hash);
+        bytes memory value = load_bytes_from_transient(atom_hash);
 
-        if (value == bytes32(0)) {
+        if (value.length == 0) {
             // not defined
             return atom;
         }
 
-        // Convert back to bytes
-        bytes memory result = new bytes(32);
-        assembly {
-            mstore(add(result, 0x20), value)
-        }
+        return value;
+    }
 
-        // Find actual length by looking for null terminator
-        uint256 actual_length = 0;
-        for (uint256 i = 0; i < 32; i++) {
-            if (result[i] == 0) break;
-            actual_length++;
+    function store_bytes_in_transient(bytes32 key, bytes memory data) internal {
+        uint256 length = data.length;
+        
+        // Store length in first slot
+        tstore(key, bytes32(length));
+        
+        // Store data in subsequent slots
+        uint256 slot_count = (length + 31) / 32; // ceiling division
+        for (uint256 i = 0; i < slot_count; i++) {
+            bytes32 slot_key = bytes32(uint256(key) + 1 + i);
+            bytes32 slot_data;
+            
+            // Extract 32 bytes from data starting at position i * 32
+            uint256 start_pos = i * 32;
+            uint256 end_pos = start_pos + 32;
+            if (end_pos > length) {
+                end_pos = length;
+            }
+            
+            // Copy data to slot_data
+            assembly {
+                let data_ptr := add(data, 0x20)
+                slot_data := mload(add(data_ptr, start_pos))
+            }
+            
+            tstore(slot_key, slot_data);
         }
+    }
 
-        // Resize to actual length
-        assembly {
-            mstore(result, actual_length)
+    function load_bytes_from_transient(bytes32 key) internal view returns (bytes memory) {
+        // Load length from first slot
+        bytes32 length_slot = tload(key);
+        uint256 length = uint256(length_slot);
+        
+        if (length == 0) {
+            return new bytes(0);
         }
-
+        
+        // Create result array
+        bytes memory result = new bytes(length);
+        
+        // Load data from subsequent slots
+        uint256 slot_count = (length + 31) / 32; // ceiling division
+        for (uint256 i = 0; i < slot_count; i++) {
+            bytes32 slot_key = bytes32(uint256(key) + 1 + i);
+            bytes32 slot_data = tload(slot_key);
+            
+            // Copy slot data to result
+            uint256 start_pos = i * 32;
+            uint256 copy_length = 32;
+            if (start_pos + copy_length > length) {
+                copy_length = length - start_pos;
+            }
+            
+            assembly {
+                let result_ptr := add(result, 0x20)
+                let dest := add(result_ptr, start_pos)
+                mstore(dest, slot_data)
+            }
+        }
+        
         return result;
     }
 
