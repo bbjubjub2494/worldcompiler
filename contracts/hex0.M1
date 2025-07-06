@@ -1,4 +1,4 @@
-;; This creation code implements hex0: a minimal hex decoder used for bootstrapping.
+;; hex0: a minimal hex decoder used for bootstrapping.
 
 ;; STACK LAYOUT
 ;; [0] toggle
@@ -7,13 +7,12 @@
 ;; [3] i
 ;; [4] c, n, b
 
-:start
 PUSH0
 PUSH0
 PUSH0
 PUSH0
 
-:loop
+:loop ; (04)
 JUMPDEST
 
 CALLDATASIZE
@@ -112,7 +111,7 @@ CALLDATASIZE
 DUP2
 LT
 ISZERO
-PUSH1 +endcommentloop
+PUSH1 +endloop
 JUMPI ; if i >= calldatasize
 
 DUP1
@@ -127,20 +126,17 @@ SWAP1
 PUSH1 '0d'
 EQ
 OR
-ISZERO
-PUSH1 +commentloop
-JUMPI ; if !(c == '\n" || c == '\r')
-
-:endcommentloop
-JUMPDEST
 PUSH1 +next
+JUMPI ; if (c == '\n" || c == '\r')
+
+PUSH1 +commentloop
 JUMP
 
 :nibble
 JUMPDEST
 
 DUP5
-PUSH1 +toggle
+PUSH1 +toggle_on
 JUMPI ; if toggle
 
 PUSH1 '04'
@@ -151,7 +147,7 @@ POP ; hold = n << 4
 PUSH1 +after_toggle
 JUMP
 
-:toggle
+:toggle_on
 JUMPDEST
 
 DUP4
