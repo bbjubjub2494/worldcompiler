@@ -1,4 +1,4 @@
-from contracts import load_datacontract_initcode_prefix, load_hex0
+from contracts import load_datacontract_initcode_prefix, load_hex0, InputAddressedRegistry
 
 import boa
 
@@ -27,6 +27,9 @@ def deploy_M1():
     address, _ = boa.env.deploy_code(bytecode=initcode)
     return address
 
+def deploy_InputAddressedRegistry():
+    return InputAddressedRegistry.deploy()
+
 def compile_sol(src, contract_name):
     datacontract_initcode_prefix = load_datacontract_initcode_prefix()
     data = json.loads(subprocess.run(
@@ -40,3 +43,4 @@ def moccasin_main():
     deploy_hex0()
     deploy_hex2()
     deploy_M1()
+    deploy_InputAddressedRegistry()
