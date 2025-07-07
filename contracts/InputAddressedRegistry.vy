@@ -23,5 +23,4 @@ def get(
     input_hash: bytes32,
 ) -> bytes32:
     output_hash: bytes32 = self.output_hash[function_codehash][input_hash]
-    assert output_hash != empty(bytes32), "output not yet computed"
     return output_hash
