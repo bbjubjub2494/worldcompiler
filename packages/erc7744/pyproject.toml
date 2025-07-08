@@ -5,6 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "deterministic-deployment-proxy",
     "solc-select>=1.1.0",
     "titanoboa>=0.2.7",
     "util",
@@ -19,3 +20,4 @@ build-backend = "setuptools.build_meta"
 
 [tool.uv.sources]
 util = { workspace = true }
+deterministic-deployment-proxy = { workspace = true }

@@ -4,6 +4,7 @@ requires-python = ">=3.12"
 
 [manifest]
 members = [
+    "deterministic-deployment-proxy",
     "erc7744",
     "ethbootstrap",
     "util",
@@ -286,10 +287,16 @@ wheels = [
 ]
 
 [[package]]
+name = "deterministic-deployment-proxy"
+version = "0.1.0"
+source = { editable = "packages/deterministic-deployment-proxy" }
+
+[[package]]
 name = "erc7744"
 version = "0.1.0"
 source = { editable = "packages/erc7744" }
 dependencies = [
+    { name = "deterministic-deployment-proxy" },
     { name = "solc-select" },
     { name = "titanoboa" },
     { name = "util" },
@@ -297,6 +304,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
+    { name = "deterministic-deployment-proxy", editable = "packages/deterministic-deployment-proxy" },
     { name = "solc-select", specifier = ">=1.1.0" },
     { name = "titanoboa", specifier = ">=0.2.7" },
     { name = "util", virtual = "packages/util" },
