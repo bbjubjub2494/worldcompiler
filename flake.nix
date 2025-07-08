@@ -20,7 +20,6 @@
               })
             ];
           })
-          solc # Solidity compiler
         ];
       };
       });

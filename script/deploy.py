@@ -1,4 +1,5 @@
 from contracts import load_datacontract_initcode_prefix, load_hex0, InputAddressedRegistry
+from util import compile_sol
 
 import boa
 
@@ -29,15 +30,6 @@ def deploy_M1():
 
 def deploy_InputAddressedRegistry():
     return InputAddressedRegistry.deploy()
-
-def compile_sol(src, contract_name):
-    datacontract_initcode_prefix = load_datacontract_initcode_prefix()
-    data = json.loads(subprocess.run(
-        ("solc", "--combined-json=bin", src),
-        check=True,
-        stdout=subprocess.PIPE,
-    ).stdout)
-    return bytes.fromhex(data["contracts"][f"{src}:{contract_name}"]["bin"])
 
 def moccasin_main():
     deploy_hex0()

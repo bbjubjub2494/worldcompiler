@@ -7,6 +7,7 @@ requires-python = ">=3.12"
 dependencies = [
     "solc-select>=1.1.0",
     "titanoboa>=0.2.7",
+    "util",
 ]
 
 [build-system]
@@ -15,3 +16,6 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.package-data]
 "*" = ["*.sol"]
+
+[tool.uv.sources]
+util = { workspace = true }

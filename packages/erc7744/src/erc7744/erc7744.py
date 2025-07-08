@@ -1,8 +1,9 @@
-from solc_select import solc_select
 import boa
 from boa.util.abi import Address
 
-import functools, importlib.resources, json, subprocess
+import functools, importlib.resources
+
+from util import compile_sol
 
 # per ERC-7744
 solc_version = "0.8.28"
@@ -19,21 +20,8 @@ arachnid_deployer_bytecode = bytes.fromhex("7fffffffffffffffffffffffffffffffffff
 
 @functools.cache
 def get_bytecode():
-    if not solc_select.install_artifacts([solc_version]):
-        raise Error(f"Failed to install solc version {solc_version}")
-    solc = solc_select.artifact_path(solc_version)
     with importlib.resources.as_file(importlib.resources.files(__package__) / "ERC7744.sol") as src:
-        r = subprocess.run([
-            solc,
-            "--combined-json", "bin",
-            "--input-file", src,
-            *solc_opts
-        ], check=True, stdout=subprocess.PIPE)
-    for _, it in json.loads(r.stdout)["contracts"].items():
-        bytecode = it["bin"]
-        break
-    bytecode = bytes.fromhex(bytecode)
-    return bytecode
+        return compile_sol(src, "ERC7744", solc_version, solc_opts)
 
 def deploy():
     boa.env.set_code(arachnid_deployer_address, arachnid_deployer_bytecode)
