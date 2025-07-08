@@ -43,15 +43,13 @@ def test_verifier(hex2_contract, M1_contract, inputaddressed_registry):
     build = Path("build")
 
     input_bytes = (contracts/"evm_defs.M1").read_bytes() + (contracts/"hex0.M1").read_bytes()
-    expected_output_hash = keccak256((build/"hex0.bin").read_bytes())
+    expected_output =(build/"hex0.bin").read_bytes()
 
     with boa.env.anchor():
         r = boa.env.raw_call(to_address=M1_contract, data=input_bytes)
         assert r.is_success
         hex2_bytes = r.output
 
-    def code_hash(address):
-        return keccak256(boa.env.get_code(address))
     graph = Node(Blob(code_hash(hex2_contract)),
     Node(Blob(code_hash(M1_contract)), Blob(keccak256(input_bytes))))
 
@@ -59,4 +57,8 @@ def test_verifier(hex2_contract, M1_contract, inputaddressed_registry):
     inputaddressed_registry.register(hex2_contract, hex2_bytes)
 
     output_hash = get_output_hash(inputaddressed_registry, graph)
-    assert output_hash == expected_output_hash
+    assert output_hash == keccak256(expected_output)
+
+
+def code_hash(address):
+    return keccak256(boa.env.get_code(address))

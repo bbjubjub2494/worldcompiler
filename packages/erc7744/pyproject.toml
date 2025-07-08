@@ -1,0 +1,17 @@
+[project]
+name = "erc7744"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "solc-select>=1.1.0",
+    "titanoboa>=0.2.7",
+]
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.package-data]
+"*" = ["*.sol"]
