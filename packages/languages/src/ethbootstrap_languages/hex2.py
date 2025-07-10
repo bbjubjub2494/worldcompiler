@@ -1,6 +1,6 @@
 from typing import NamedTuple
 
-from .parser import ParserWithComments, ParserStrict, TokenType
+from .parser import ParserWithComments, ParserStrict, TokenType, Tokenizer
 
 class LabelReference(NamedTuple):
     label: bytes
@@ -8,7 +8,7 @@ class LabelReference(NamedTuple):
 
 class Hex2Parser(ParserStrict, ParserWithComments):
     @classmethod
-    def _tokenizer(cls):
+    def _tokenizer(cls) -> Tokenizer:
         label = rb"([a-zA-Z_][a-zA-Z0-9_]*)"
         return super()._tokenizer().add_token_type(
             TokenType(b'label_definition', rb':'+label),
@@ -16,28 +16,33 @@ class Hex2Parser(ParserStrict, ParserWithComments):
             TokenType(b'hex', rb'[0-9a-fA-F]{2}'),
         )
 
-    def __init__(self):
+    offsets: dict[bytes, int]
+    chunks_or_references: list[bytearray | LabelReference]
+
+    def __init__(self) -> None:
         super().__init__()
         self.offsets = {}
-        self.chunks_or_references = [bytearray()]
+        self.current_chunk = bytearray()
+        self.chunks_or_references = [self.current_chunk]
         self.current_offset = 0
 
-    def _handle_label_definition(self, value: bytes):
+    def _handle_label_definition(self, value: bytes) -> None:
         label = value[1:]
         self.offsets[label] = self.current_offset
 
-    def _handle_label_reference(self, value: bytes):
+    def _handle_label_reference(self, value: bytes) -> None:
         label = value[1:]
         lr = LabelReference(label, 1)
         self.chunks_or_references.append(lr)
         self.current_offset += lr.length
-        self.chunks_or_references.append(bytearray())
+        self.current_chunk = bytearray()
+        self.chunks_or_references.append(self.current_chunk)
 
-    def _handle_hex(self, value: bytes):
-        self.chunks_or_references[-1].append(int(value, 16))
+    def _handle_hex(self, value: bytes) -> None:
+        self.current_chunk.append(int(value, 16))
         self.current_offset += 1
 
-    def _result(self):
+    def _result(self) -> bytes:
         output = bytearray()
         for chunk in self.chunks_or_references:
             if isinstance(chunk, LabelReference):

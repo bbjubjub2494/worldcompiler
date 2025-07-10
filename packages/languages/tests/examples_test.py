@@ -1,8 +1,9 @@
-from typing import NamedTuple
+from dataclasses import dataclass
 
 import pytest
 
-class Example(NamedTuple):
+@dataclass
+class Example:
     input: bytes
     expected_output: bytes | None = None
     error: type[Exception] | None = None
