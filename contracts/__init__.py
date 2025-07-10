@@ -1,6 +1,8 @@
 import subprocess
 from pathlib import Path
 
+from ethbootstrap_languages import Hex2Parser
+
 def load_datacontract_initcode_prefix():
     # FIXME: hardcoded path
     f = compile_hex2("contracts/datacontract_initcode_prefix.hex2")
@@ -28,8 +30,5 @@ def compile_M1(src):
 def compile_hex2(src):
     src = Path(src)
     dst = Path(f"build/{src.stem}.bin")
-    subprocess.run(
-        ("hex2", "-f", src, "-o", dst),
-        check=True,
-    )
+    dst.write_bytes(Hex2Parser.parse(src.read_bytes()))
     return dst

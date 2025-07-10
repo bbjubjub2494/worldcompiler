@@ -1,4 +1,4 @@
-import functools, json, subprocess
+import functools, json, pathlib, subprocess
 
 from solc_select import solc_select
 
@@ -10,6 +10,7 @@ def get_solc(solc_version):
 
 def compile_sol(src, contract_name, solc_version="0.8.28", solc_opts=[]):
     try:
+        src = pathlib.Path(src)
         # solc output uses relative paths if possible
         src = src.relative_to(src.cwd())
     except ValueError:
