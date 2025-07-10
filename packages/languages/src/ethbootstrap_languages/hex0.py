@@ -1,52 +1,89 @@
-import itertools, re
+import functools, itertools, re
 
-COMMENT = re.compile(rb'[#;][^\n]*\n?')
+class Tokenizer:
+    '''Declarative tokenizer
+    Based on https://docs.python.org/3/library/re.html#writing-a-tokenizer
+    '''
+    def __init__(self, token_spec):
+        self.token_spec = list(token_spec)
 
-def strip_comments(chunk: bytes):
-    yield from re.split(COMMENT, chunk)
+    def tokenize(self):
+        raise NotImplementedError("Subclasses must implement this method.")
 
-HEX = re.compile(rb'[0-9a-fA-F]{2}')
-def decode_hex(chunk: bytes):
-    return bytes(int(byte.decode('ascii'), 16) for byte in re.findall(HEX, chunk))
+    @functools.cached_property
+    def pattern(self):
+        code = b'|'.join(b'(?P<%s>%s)' % spec for spec in self.token_spec)
+        return re.compile(code)
 
-LABEL = re.compile(rb':([a-zA-Z_][a-zA-Z0-9_]*)')
-POINTER = re.compile(rb'\+([a-zA-Z_][a-zA-Z0-9_]*)')
-def decode_hex_with_labels(chunks):
-    cur_offset = 0
-    offsets = {}
-    chunks_or_pointers = []
-    breakpoint()
-    for chunk in chunks:
-        for _ in itertools.batched(LABEL.split(chunk), n=2):
-            try:
-                chunk, label = _
-            except ValueError:
-                chunk = _[0]
-                label = None
-            for _ in itertools.batched(POINTER.split(chunk), n=2):
-                try:
-                    chunk, pointer = _
-                except ValueError:
-                    chunk = _[0]
-                    pointer = None
-                chunk = decode_hex(chunk)
-                chunks_or_pointers.append(chunk)
-                cur_offset += len(chunk)
-                if pointer:
-                    chunks_or_pointers.append(pointer)
-                    cur_offset += 1 # 1-byte pointer
-            if label:
-                offsets[label] = cur_offset
+    def tokenize(self, input: bytes):
+        for m in self.pattern.finditer(input):
+            kind = m.lastgroup
+            value = m.group(kind)
+            yield kind, value
 
-    for _ in chunks_or_pointers:
-        if isinstance(_, bytes):
-            pointer = _
-            if pointer in offsets:
-                yield offsets[pointer].to_bytes(1, 'big')
-        else:
-            yield _
+    def add_token_type(self, *spec):
+        return Tokenizer([*spec, *self.token_spec])
 
-print(list(strip_comments(b"hello # world\nthis is a test; comment")))
+class ParserBase:
+    @classmethod
+    def _tokenizer(cls):
+        return Tokenizer([(b'garbage', rb'.+')])
 
-print(decode_hex(b"hello 0a 1b 2c 3d 4e"))
-print(list(decode_hex_with_labels([b"hello 0a 1b 2c 3d 4e:label1 +label2"])))
+    def __init_subclass__(cls):
+        cls.tokenizer = cls._tokenizer()
+
+    @classmethod
+    def parse(cls, input: bytes):
+        parser = cls()
+        for kind, value in cls.tokenizer.tokenize(input):
+            handler = getattr(parser, f'_handle_{kind}')
+            handler(value)
+        return parser._result()
+
+    def _handle_garbage(self, value: bytes):
+        raise ValueError(f'Unexpected bytes: {value!r}')
+
+    def _result(self):
+        return None
+
+class ParserWithWhitespace(ParserBase):
+    @classmethod
+    def _tokenizer(cls):
+        return super()._tokenizer().add_token_type(
+            (b'whitespace', rb'\s+'),
+        )
+
+    def _handle_whitespace(self, _: bytes):
+        pass
+
+class ParserWithComments(ParserWithWhitespace):
+    @classmethod
+    def _tokenizer(cls):
+        return super()._tokenizer().add_token_type(
+            (b'comment', rb'[#;][^\n]*\n?'),
+        )
+
+    def _handle_comment(self, _: bytes):
+        pass
+
+class Hex0Parser(ParserWithComments):
+    @classmethod
+    def _tokenizer(cls):
+        return super()._tokenizer().add_token_type(
+            (b'hex', rb'[0-9a-fA-F]{2}'),
+        )
+
+    def __init__(self):
+        print(self.tokenizer.pattern)
+        self.output = bytearray()
+
+    def _handle_hex(self, value: bytes):
+        self.output.append(int(value, 16))
+
+    def _result(self):
+        return bytes(self.output)
+
+print(ParserWithWhitespace.parse(b" \t"))
+#print(ParserBase.parse(b"garb"))
+print(ParserWithComments.parse(b"; garb"))
+print(Hex0Parser.parse(b"01 02 03 04 ; comment\n05 06"))
