@@ -1,3 +1,4 @@
+from collections import namedtuple
 import functools, itertools, re
 
 class Tokenizer:
@@ -83,7 +84,55 @@ class Hex0Parser(ParserWithComments):
     def _result(self):
         return bytes(self.output)
 
+LabelReference = namedtuple('LabelReference', ['label'])
+# TODO size
+
+class Hex2Parser(ParserWithComments):
+    @classmethod
+    def _tokenizer(cls):
+        label = rb"([a-zA-Z_][a-zA-Z0-9_]*)"
+        return super()._tokenizer().add_token_type(
+            (b'label_definition', rb':'+label),
+            (b'label_reference', rb'\+'+label),
+            (b'hex', rb'[0-9a-fA-F]{2}'),
+        )
+
+    def __init__(self):
+        super().__init__()
+        self.offsets = {}
+        self.chunks_or_references = [bytearray()]
+        self.current_offset = 0
+
+    def _handle_label_definition(self, value: bytes):
+        label = value[1:]
+        self.offsets[label] = len(self.current_offset)
+
+    def _handle_label_reference(self, value: bytes):
+        label = value[1:]
+        if label not in self.offsets:
+            raise ValueError(f'Undefined label: {label!r}')
+        self.chunks_or_references.append(LabelReference(label))
+        self.chunks_or_references.append(bytearray())
+        self.current_offset += 1 # size
+
+    def _handle_hex(self, value: bytes):
+        self.chunks_or_references[-1].append(int(value, 16))
+        self.current_offset += 1
+
+    def _result(self):
+        output = bytearray()
+        for chunk in self.chunks_or_references:
+            if isinstance(chunk, LabelReference):
+                label = chunk.label
+                if label not in self.offsets:
+                    raise ValueError(f'Undefined label: {label!r}')
+                output.extend(self.offsets[label].to_bytes(1, 'big'))
+            else:
+                output.extend(chunk)
+        return bytes(output)
+
 print(ParserWithWhitespace.parse(b" \t"))
 #print(ParserBase.parse(b"garb"))
 print(ParserWithComments.parse(b"; garb"))
 print(Hex0Parser.parse(b"01 02 03 04 ; comment\n05 06"))
+print(Hex2Parser.parse(b"01 02 03 04 ; comment\n05 06"))
