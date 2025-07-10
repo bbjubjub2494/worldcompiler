@@ -28,6 +28,25 @@ PUSH0
 BYTE ; c = byte(calldata[i])
 
 DUP1
+PUSH1 '30'
+GT
+DUP2
+PUSH1 '39'
+LT
+OR
+PUSH1 +notnumber
+JUMPI ; if '0' > c || '9' < c
+
+PUSH1 '30'
+SWAP1
+SUB ; n = c - '0'
+PUSH1 +nibble
+JUMP
+
+:notnumber
+JUMPDEST
+
+DUP1
 PUSH1 '61'
 GT
 DUP2
@@ -63,25 +82,6 @@ PUSH1 +nibble
 JUMP
 
 :notupper
-JUMPDEST
-
-DUP1
-PUSH1 '30'
-GT
-DUP2
-PUSH1 '39'
-LT
-OR
-PUSH1 +notnumber
-JUMPI ; if '0' > c || '9' < c
-
-PUSH1 '30'
-SWAP1
-SUB ; n = c - '0'
-PUSH1 +nibble
-JUMP
-
-:notnumber
 JUMPDEST
 
 DUP1
