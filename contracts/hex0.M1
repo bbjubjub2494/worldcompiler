@@ -119,15 +119,10 @@ CALLDATALOAD
 PUSH0
 BYTE ; c = byte(calldata[i])
 
-DUP1
 PUSH1 '0a'
 EQ
-SWAP1
-PUSH1 '0d'
-EQ
-OR
 PUSH1 +next
-JUMPI ; if (c == '\n" || c == '\r')
+JUMPI ; if (c == '\n")
 
 PUSH1 +commentloop
 JUMP
