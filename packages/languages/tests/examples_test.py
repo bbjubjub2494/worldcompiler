@@ -18,9 +18,18 @@ class Example(NamedTuple):
 
 from ethbootstrap_languages.parser import ParserWithWhitespace, ParserWithComments
 
+from ethbootstrap_languages.parser import ParserStrict
+
+STRICT_EXAMPLES = [
+    Example(b"garb", error=ValueError),
+]
+
+def test_parser_examples():
+    for example in STRICT_EXAMPLES:
+        example.check(ParserStrict)
+
 WHITESPACE_EXAMPLES = [
     Example(b" \t"),
-    Example(b"garb", error=ValueError),
 ]
 
 COMMENT_EXAMPLES = WHITESPACE_EXAMPLES + [

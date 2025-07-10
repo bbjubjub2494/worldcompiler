@@ -1,19 +1,19 @@
 from typing import NamedTuple
 
-from .parser import ParserWithComments
+from .parser import ParserWithComments, ParserStrict, TokenType
 
 class LabelReference(NamedTuple):
     label: bytes
     length: int
 
-class Hex2Parser(ParserWithComments):
+class Hex2Parser(ParserStrict, ParserWithComments):
     @classmethod
     def _tokenizer(cls):
         label = rb"([a-zA-Z_][a-zA-Z0-9_]*)"
         return super()._tokenizer().add_token_type(
-            (b'label_definition', rb':'+label),
-            (b'label_reference', rb'\+'+label),
-            (b'hex', rb'[0-9a-fA-F]{2}'),
+            TokenType(b'label_definition', rb':'+label),
+            TokenType(b'label_reference', rb'\+'+label),
+            TokenType(b'hex', rb'[0-9a-fA-F]{2}'),
         )
 
     def __init__(self):

@@ -1,10 +1,10 @@
-from .parser import ParserWithComments
+from .parser import ParserWithComments, ParserStrict, TokenType
 
-class Hex0Parser(ParserWithComments):
+class Hex0Parser(ParserStrict, ParserWithComments):
     @classmethod
     def _tokenizer(cls):
         return super()._tokenizer().add_token_type(
-            (b'hex', rb'[0-9a-fA-F]{2}'),
+            TokenType(b'hex', rb'[0-9a-fA-F]{2}'),
         )
 
     def __init__(self):
