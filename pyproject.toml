@@ -10,5 +10,5 @@ dependencies = []
 members = [
     "packages/erc7744",
     "packages/util",
-    "packages/deterministic-deployment-proxy",
+    "packages/deterministic-deployment-proxy", "packages/languages",
 ]

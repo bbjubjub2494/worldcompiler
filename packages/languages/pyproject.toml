@@ -1,0 +1,16 @@
+[project]
+name = "ethbootstrap-languages"
+version = "0.1.0"
+description = "Add your description here"
+authors = [
+    { name = "Julie B.", email = "no-reply@bbjubjub.fr" }
+]
+requires-python = ">=3.12"
+dependencies = []
+
+[project.scripts]
+ethbootstrap-languages = "ethbootstrap_languages:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
