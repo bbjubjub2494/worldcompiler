@@ -22,3 +22,15 @@ def test_input_addressed_registry(hex0_contract, inputaddressed_registry):
         codehash = keccak256(boa.env.get_code(hex0_contract))
         output = inputaddressed_registry.get(codehash, keccak256(input_bytes))
         assert output == keccak256(expected_output), f"Failed for input: {input_bytes.hex()}"
+
+def test_bad_functions(inputaddressed_registry):
+    identity_precompile = "4".rjust(40, "0")
+
+    with boa.reverts("empty function"):
+        inputaddressed_registry.register(identity_precompile, b"test")
+
+    # Make account empty (codehash=keccak256("")) instead of nonexistent (codehash=0)
+    boa.env.raw_call(to_address=identity_precompile, value=1)
+
+    with boa.reverts("empty function"):
+        inputaddressed_registry.register(identity_precompile, b"test")

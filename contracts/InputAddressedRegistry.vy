@@ -10,6 +10,9 @@ def register(
     function_codehash: bytes32 = function.codehash
     input_hash: bytes32 = keccak256(input)
 
+    if function_codehash in [keccak256(""), empty(bytes32)]:
+        raise "empty function"
+
     if self.output_hash[function_codehash][input_hash] != empty(bytes32):
         raise "output already computed"
 
