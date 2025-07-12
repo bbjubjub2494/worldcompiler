@@ -11,3 +11,9 @@ testall:
 	just $d/test
 	fi
 	done
+
+fmt:
+	black .
+
+fmt-check:
+	black --check .

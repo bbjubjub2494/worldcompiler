@@ -2,18 +2,24 @@ from typing import NamedTuple
 
 from .parser import ParserWithComments, ParserStrict, TokenType, Tokenizer
 
+
 class LabelReference(NamedTuple):
     label: bytes
     length: int
+
 
 class Hex2Parser(ParserWithComments):
     @classmethod
     def _tokenizer(cls) -> Tokenizer:
         label = rb"([a-zA-Z_][a-zA-Z0-9_]*)"
-        return super()._tokenizer().add_token_type(
-            TokenType(b'label_definition', rb':'+label),
-            TokenType(b'label_reference', rb'\+'+label),
-            TokenType(b'hex', rb'[0-9a-fA-F]{2}'),
+        return (
+            super()
+            ._tokenizer()
+            .add_token_type(
+                TokenType(b"label_definition", rb":" + label),
+                TokenType(b"label_reference", rb"\+" + label),
+                TokenType(b"hex", rb"[0-9a-fA-F]{2}"),
+            )
         )
 
     offsets: dict[bytes, int]
@@ -49,10 +55,11 @@ class Hex2Parser(ParserWithComments):
                 label = chunk.label
                 if label not in self.offsets:
                     raise ValueError(f'Undefined label: {label.decode("ascii")}')
-                output.extend(self.offsets[label].to_bytes(1, 'big'))
+                output.extend(self.offsets[label].to_bytes(1, "big"))
             else:
                 output.extend(chunk)
         return bytes(output)
+
 
 class Hex2ParserStrict(Hex2Parser, ParserStrict):
     pass
