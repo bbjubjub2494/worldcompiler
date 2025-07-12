@@ -29,9 +29,9 @@ class Tokenizer:
     def tokenize(self, input) -> Iterator[tuple[str, bytes]]:
         for m in self.pattern.finditer(input):
             kind = m.lastgroup
-            assert (
-                kind is not None
-            ), "this should never happen by construction of the pattern"
+            assert kind is not None, (
+                "this should never happen by construction of the pattern"
+            )
             value = m.group(kind)
             yield kind, value
 

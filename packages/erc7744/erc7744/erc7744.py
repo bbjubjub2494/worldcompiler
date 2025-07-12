@@ -1,5 +1,5 @@
-import boa # type: ignore
-from boa.util.abi import Address # type: ignore
+import boa  # type: ignore
+from boa.util.abi import Address  # type: ignore
 
 import functools, importlib.resources
 

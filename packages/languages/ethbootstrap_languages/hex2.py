@@ -54,7 +54,7 @@ class Hex2Parser(ParserWithComments):
             if isinstance(chunk, LabelReference):
                 label = chunk.label
                 if label not in self.offsets:
-                    raise ValueError(f'Undefined label: {label.decode("ascii")}')
+                    raise ValueError(f"Undefined label: {label.decode('ascii')}")
                 output.extend(self.offsets[label].to_bytes(1, "big"))
             else:
                 output.extend(chunk)

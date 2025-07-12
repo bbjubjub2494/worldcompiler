@@ -1,6 +1,6 @@
-import boa # type: ignore
+import boa  # type: ignore
 
-from boa.util.abi import Address # type: ignore
+from boa.util.abi import Address  # type: ignore
 
 proxy_address = "0x4e59b44847b379578588920ca78fbf26c0b4956c"
 proxy_bytecode = bytes.fromhex(

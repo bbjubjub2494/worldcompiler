@@ -13,10 +13,13 @@ testall:
 	done
 
 fmt:
-	black .
+	ruff format .
 
 fmt-check:
-	black --check .
+	ruff format --check .
+
+lint:
+	ruff check .
 
 typecheck:
 	mypy .

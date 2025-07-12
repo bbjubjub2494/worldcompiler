@@ -1,6 +1,6 @@
-import boa # type: ignore
+import boa  # type: ignore
 
-from boa.util.abi import Address, abi_decode # type: ignore
+from boa.util.abi import Address, abi_decode  # type: ignore
 
 factory_address = "0xC0DE207acb0888c5409E51F27390Dad75e4ECbe7"
 factory_bytecode = bytes.fromhex("60203d3d3582360380843d373d34f580601457fd5b3d52f3")

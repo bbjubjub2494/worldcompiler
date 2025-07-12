@@ -1,6 +1,6 @@
 import functools, json, pathlib, subprocess
 
-from solc_select import solc_select # type: ignore
+from solc_select import solc_select  # type: ignore
 
 
 @functools.cache
