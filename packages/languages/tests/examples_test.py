@@ -43,7 +43,7 @@ def test_parser_examples():
     for example in COMMENT_EXAMPLES:
         example.check(ParserWithComments)
 
-from ethbootstrap_languages import Hex0Parser
+from ethbootstrap_languages import Hex0ParserStrict
 
 HEX0_EXAMPLES = COMMENT_EXAMPLES + [
     Example(b"", b""),
@@ -59,9 +59,9 @@ HEX0_EXAMPLES = COMMENT_EXAMPLES + [
 ]
 def test_hex0_examples():
     for example in HEX0_EXAMPLES:
-        example.check(Hex0Parser)
+        example.check(Hex0ParserStrict)
 
-from ethbootstrap_languages import Hex2Parser
+from ethbootstrap_languages import Hex2ParserStrict
 
 HEX2_EXAMPLES = HEX0_EXAMPLES + [
     Example(b":label1 01 02 03 04 +label1", b'\x01\x02\x03\x04\x00'),
@@ -77,4 +77,4 @@ HEX2_EXAMPLES = HEX0_EXAMPLES + [
 
 def test_hex2_examples():
     for example in HEX2_EXAMPLES:
-        example.check(Hex2Parser)
+        example.check(Hex2ParserStrict)

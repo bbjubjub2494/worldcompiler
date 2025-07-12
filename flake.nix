@@ -12,6 +12,7 @@
     devShells = inputs.nixpkgs.lib.genAttrs systems (system:
       with inputs.nixpkgs.legacyPackages.${system}; {
         default = mkShell {packages = [
+          just
           (mescc-tools.overrideAttrs { # hex2, M1
             patches = [
               (fetchpatch {

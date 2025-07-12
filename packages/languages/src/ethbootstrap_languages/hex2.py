@@ -6,7 +6,7 @@ class LabelReference(NamedTuple):
     label: bytes
     length: int
 
-class Hex2Parser(ParserStrict, ParserWithComments):
+class Hex2Parser(ParserWithComments):
     @classmethod
     def _tokenizer(cls) -> Tokenizer:
         label = rb"([a-zA-Z_][a-zA-Z0-9_]*)"
@@ -53,3 +53,6 @@ class Hex2Parser(ParserStrict, ParserWithComments):
             else:
                 output.extend(chunk)
         return bytes(output)
+
+class Hex2ParserStrict(Hex2Parser, ParserStrict):
+    pass

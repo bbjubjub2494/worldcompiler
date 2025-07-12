@@ -7,12 +7,4 @@ requires-python = ">=3.12"
 dependencies = []
 
 [tool.uv.workspace]
-members = [
-    "packages/erc7744",
-    "packages/util",
-    "packages/deterministic-deployment-proxy",
-    "packages/languages",
-    "packages/computation_registry",
-    "packages/seeds",
-    "packages/erc7955",
-]
+members = [ "packages/*" ]
