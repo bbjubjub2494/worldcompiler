@@ -7,7 +7,7 @@ dependencies = [
     "deterministic-deployment-proxy",
     "solc-select>=1.1.0",
     "titanoboa>=0.2.7",
-    "util",
+    "ethbootstrap-util",
 ]
 
 [build-system]
@@ -15,5 +15,5 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.uv.sources]
-util = { workspace = true }
+ethbootstrap-util = { workspace = true }
 deterministic-deployment-proxy = { workspace = true }

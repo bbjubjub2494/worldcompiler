@@ -3,8 +3,8 @@ from boa.util.abi import Address
 
 import functools, importlib.resources
 
-from util import compile_sol
 from deterministic_deployment_proxy import proxy_deploy
+from ethbootstrap_util import compile_sol
 
 # per ERC-7744
 solc_version = "0.8.28"
