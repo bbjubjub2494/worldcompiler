@@ -17,3 +17,6 @@ fmt:
 
 fmt-check:
 	black --check .
+
+typecheck:
+	mypy .
