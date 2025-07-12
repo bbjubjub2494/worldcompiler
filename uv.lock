@@ -8,6 +8,7 @@ members = [
     "erc7744",
     "ethbootstrap",
     "ethbootstrap-languages",
+    "ethbootstrap-seeds",
     "util",
 ]
 
@@ -462,6 +463,21 @@ source = { virtual = "." }
 name = "ethbootstrap-languages"
 version = "0.1.0"
 source = { editable = "packages/languages" }
+
+[[package]]
+name = "ethbootstrap-seeds"
+version = "0.1.0"
+source = { editable = "packages/seeds" }
+
+[package.dev-dependencies]
+dev = [
+    { name = "hypothesis" },
+]
+
+[package.metadata]
+
+[package.metadata.requires-dev]
+dev = [{ name = "hypothesis", specifier = ">=6.135.26" }]
 
 [[package]]
 name = "ghp-import"

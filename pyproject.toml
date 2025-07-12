@@ -13,4 +13,5 @@ members = [
     "packages/deterministic-deployment-proxy",
     "packages/languages",
     "packages/computation_registry",
+    "packages/seeds",
 ]

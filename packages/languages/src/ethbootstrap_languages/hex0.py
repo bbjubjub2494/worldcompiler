@@ -1,6 +1,6 @@
 from .parser import ParserWithComments, ParserStrict, Tokenizer, TokenType
 
-class Hex0Parser(ParserStrict, ParserWithComments):
+class Hex0Parser(ParserWithComments):
     @classmethod
     def _tokenizer(cls) -> Tokenizer:
         return super()._tokenizer().add_token_type(
@@ -8,7 +8,6 @@ class Hex0Parser(ParserStrict, ParserWithComments):
         )
 
     def __init__(self) -> None:
-        print(self.tokenizer.pattern)
         self.output = bytearray()
 
     def _handle_hex(self, value: bytes) -> None:
@@ -16,3 +15,6 @@ class Hex0Parser(ParserStrict, ParserWithComments):
 
     def _result(self) -> bytes:
         return bytes(self.output)
+
+class Hex0ParserStrict(ParserStrict, Hex0Parser):
+    pass

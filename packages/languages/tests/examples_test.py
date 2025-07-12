@@ -46,6 +46,15 @@ def test_parser_examples():
 from ethbootstrap_languages import Hex0Parser
 
 HEX0_EXAMPLES = COMMENT_EXAMPLES + [
+    Example(b"", b""),
+    Example(b"00", b"\x00"),
+    Example(b"10", b"\x10"),
+    Example(b"98", b"\x98"),
+    Example(b" AB", b"\xab"),
+    Example(b"xAB", b"\xab", error=ValueError),
+    Example(b"ab # comment\n cd", b"\xab\xcd"),
+    Example(b"ABCD", b"\xab\xcd"),
+    Example(b"AB CD EF # comment", b"\xab\xcd\xef"),
     Example(b"01 02 03 04 ; comment\n05 06", b'\x01\x02\x03\x04\x05\x06'),
 ]
 def test_hex0_examples():
@@ -58,6 +67,12 @@ HEX2_EXAMPLES = HEX0_EXAMPLES + [
     Example(b":label1 01 02 03 04 +label1", b'\x01\x02\x03\x04\x00'),
     Example(b"+label2 01 02 03 04 :label2", b'\x05\x01\x02\x03\x04'),
     Example(b"a1 +X b2 :X c3 +X d4", b'\xa1\x03\xb2\xc3\x03\xd4'),
+    Example(b":label 00", b"\x00"),
+    Example(b"a :label b", b"\xab", error=ValueError),
+    Example(b"cdef :something", b"\xcd\xef"),
+    Example(b":a ab +a", b"\xab\x00"),
+    Example(b"ab :label +label", b"\xab\x01"),
+    Example(b"ab +label :label", b"\xab\x02"),
 ]
 
 def test_hex2_examples():

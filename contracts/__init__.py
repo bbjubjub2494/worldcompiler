@@ -13,11 +13,6 @@ def load_inputaddressed_initcode_template():
     f = compile_hex2(f)
     return f.read_bytes()
 
-def load_hex0():
-    f = compile_M1("contracts/hex0.M1")
-    f = compile_hex2(f)
-    return f.read_bytes()
-
 def compile_M1(src):
     src = Path(src)
     dst = Path(f"build/{src.stem}.hex2")
