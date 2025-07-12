@@ -1,2 +1,4 @@
+set fallback
+
 test:
 	uv run mox test
