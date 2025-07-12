@@ -6,6 +6,7 @@ requires-python = ">=3.12"
 members = [
     "deterministic-deployment-proxy",
     "erc7744",
+    "erc7955",
     "ethbootstrap",
     "ethbootstrap-languages",
     "ethbootstrap-seeds",
@@ -311,6 +312,11 @@ requires-dist = [
     { name = "titanoboa", specifier = ">=0.2.7" },
     { name = "util", virtual = "packages/util" },
 ]
+
+[[package]]
+name = "erc7955"
+version = "0.1.0"
+source = { editable = "packages/erc7955" }
 
 [[package]]
 name = "eth-abi"

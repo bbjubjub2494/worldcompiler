@@ -23,4 +23,4 @@ def get_bytecode():
         return compile_sol(src, "ERC7744", solc_version, solc_opts)
 
 def deploy():
-    return proxy_deploy(deployment_salt, get_bytecode())
+    return proxy_deploy(get_bytecode(), deployment_salt=deployment_salt)
