@@ -11,6 +11,8 @@ proxy_bytecode = bytes.fromhex(
 
 
 def proxy_deploy(initcode: bytes, deployment_salt: bytes = bytes(32)) -> Address:
+    if len(deployment_salt) != 32:
+        raise ValueError("Deployment salt must be exactly 32 bytes long")
     boa.env.set_code(proxy_address, proxy_bytecode)
 
     data = deployment_salt + initcode
