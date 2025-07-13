@@ -1,4 +1,2 @@
-set fallback
-
 test:
 	uv run pytest
