@@ -1,3 +1,5 @@
+#flake8: noqa: E402
+
 from dataclasses import dataclass
 
 import pytest
@@ -28,7 +30,7 @@ STRICT_EXAMPLES = [
 ]
 
 
-def test_parser_examples():
+def test_parser_strict_examples():
     for example in STRICT_EXAMPLES:
         example.check(ParserStrict)
 

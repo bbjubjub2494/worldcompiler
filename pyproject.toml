@@ -11,3 +11,8 @@ members = [ "packages/*" ]
 
 [tool.mypy]
 exclude = ["tests/"]
+
+[tool.ruff.lint]
+ignore = [
+    "F401",  # Module imported but unused, complains in __init__.py files
+]

@@ -1,4 +1,7 @@
-import functools, json, pathlib, subprocess
+import functools
+import json
+import pathlib
+import subprocess
 
 from solc_select import solc_select  # type: ignore
 
@@ -6,7 +9,7 @@ from solc_select import solc_select  # type: ignore
 @functools.cache
 def get_solc(solc_version):
     if not solc_select.install_artifacts([solc_version]):
-        raise Error(f"Failed to install solc version {solc_version}")
+        raise Exception(f"Failed to install solc version {solc_version}")
     return solc_select.artifact_path(solc_version)
 
 

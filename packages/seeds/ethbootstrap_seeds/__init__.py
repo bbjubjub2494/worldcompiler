@@ -1,4 +1,5 @@
-import importlib.resources, subprocess
+import importlib.resources
+import subprocess
 
 from ethbootstrap_languages import Hex2Parser
 

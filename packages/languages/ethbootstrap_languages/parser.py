@@ -3,7 +3,8 @@ from __future__ import annotations
 from abc import abstractmethod
 from typing import ClassVar, Generic, Iterator, NamedTuple, TypeVar
 
-import functools, re
+import functools
+import re
 
 
 class TokenType(NamedTuple):

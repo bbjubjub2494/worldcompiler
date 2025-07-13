@@ -1,7 +1,6 @@
-import boa  # type: ignore
-from boa.util.abi import Address  # type: ignore
 
-import functools, importlib.resources
+import functools
+import importlib.resources
 
 from deterministic_deployment_proxy import proxy_deploy
 from ethbootstrap_util import compile_sol
