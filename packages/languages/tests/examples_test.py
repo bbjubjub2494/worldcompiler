@@ -1,4 +1,4 @@
-#flake8: noqa: E402
+# flake8: noqa: E402
 
 from dataclasses import dataclass
 
