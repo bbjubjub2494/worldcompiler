@@ -4,6 +4,7 @@ alias test := testall
 [no-exit-message]
 testall:
 	#! /usr/bin/env sh
+	set -e
 	echo "=== Running tests in all packages ==="
 	for d in packages/*; do
 	if [ -f $d/justfile ]; then
