@@ -2,8 +2,19 @@ import boa  # type: ignore
 
 from boa.util.abi import Address, abi_decode  # type: ignore
 
-factory_address = "0xC0DE207acb0888c5409E51F27390Dad75e4ECbe7"
-factory_bytecode = bytes.fromhex("60203d3d3582360380843d373d34f580601457fd5b3d52f3")
+from ethbootstrap_util import create2_address_of
+
+__all__ = [
+    "factory_deploy",
+    "factory_address",
+    "factory_bytecode",
+    "factory_predict_address",
+]
+
+factory_address: Address = Address("0xC0DE945918F144DcdF063469823a4C51152Df05D")
+factory_bytecode: bytes = bytes.fromhex(
+    "60203d3d3582360380843d373d34f580601457fd5b3d52f3"
+)
 
 
 def factory_deploy(initcode: bytes, deployment_salt: bytes = bytes(32)) -> Address:
@@ -15,3 +26,11 @@ def factory_deploy(initcode: bytes, deployment_salt: bytes = bytes(32)) -> Addre
     r = boa.env.raw_call(to_address=factory_address, data=data)
 
     return abi_decode("address", r.output)
+
+
+def factory_predict_address(
+    initcode: bytes, deployment_salt: bytes = bytes(32)
+) -> Address:
+    if len(deployment_salt) != 32:
+        raise ValueError("Deployment salt must be exactly 32 bytes long")
+    return create2_address_of(factory_address, deployment_salt, initcode)

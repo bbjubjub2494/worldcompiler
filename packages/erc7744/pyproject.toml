@@ -5,7 +5,6 @@ description = "Add your description here"
 requires-python = ">=3.12"
 dependencies = [
     "deterministic-deployment-proxy",
-    "solc-select>=1.1.0",
     "titanoboa>=0.2.7",
     "ethbootstrap-util",
 ]

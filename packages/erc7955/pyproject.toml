@@ -7,8 +7,14 @@ authors = [
     { name = "Julie B.", email = "no-reply@bbjubjub.fr" }
 ]
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "ethbootstrap-util",
+    "titanoboa>=0.2.7",
+]
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[tool.uv.sources]
+ethbootstrap-util = { workspace = true }

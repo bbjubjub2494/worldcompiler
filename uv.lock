@@ -389,6 +389,12 @@ wheels = [
 name = "deterministic-deployment-proxy"
 version = "0.1.0"
 source = { editable = "packages/deterministic-deployment-proxy" }
+dependencies = [
+    { name = "ethbootstrap-util" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "ethbootstrap-util", editable = "packages/util" }]
 
 [[package]]
 name = "erc7744"
@@ -397,7 +403,6 @@ source = { editable = "packages/erc7744" }
 dependencies = [
     { name = "deterministic-deployment-proxy" },
     { name = "ethbootstrap-util" },
-    { name = "solc-select" },
     { name = "titanoboa" },
 ]
 
@@ -405,7 +410,6 @@ dependencies = [
 requires-dist = [
     { name = "deterministic-deployment-proxy", editable = "packages/deterministic-deployment-proxy" },
     { name = "ethbootstrap-util", editable = "packages/util" },
-    { name = "solc-select", specifier = ">=1.1.0" },
     { name = "titanoboa", specifier = ">=0.2.7" },
 ]
 
@@ -413,6 +417,16 @@ requires-dist = [
 name = "erc7955"
 version = "0.1.0"
 source = { editable = "packages/erc7955" }
+dependencies = [
+    { name = "ethbootstrap-util" },
+    { name = "titanoboa" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "ethbootstrap-util", editable = "packages/util" },
+    { name = "titanoboa", specifier = ">=0.2.7" },
+]
 
 [[package]]
 name = "eth-abi"
@@ -593,6 +607,12 @@ dev = [
 name = "ethbootstrap-util"
 version = "0.1.0"
 source = { editable = "packages/util" }
+dependencies = [
+    { name = "solc-select" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "solc-select", specifier = ">=1.1.0" }]
 
 [[package]]
 name = "execnet"
