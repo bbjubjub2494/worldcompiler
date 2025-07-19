@@ -586,6 +586,7 @@ version = "0.1.0"
 source = { editable = "packages/seeds" }
 dependencies = [
     { name = "ethbootstrap-languages" },
+    { name = "ethbootstrap-util" },
 ]
 
 [package.dev-dependencies]
@@ -595,7 +596,10 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "ethbootstrap-languages", editable = "packages/languages" }]
+requires-dist = [
+    { name = "ethbootstrap-languages", editable = "packages/languages" },
+    { name = "ethbootstrap-util", editable = "packages/util" },
+]
 
 [package.metadata.requires-dev]
 dev = [

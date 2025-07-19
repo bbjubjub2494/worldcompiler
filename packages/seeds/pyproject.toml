@@ -9,6 +9,7 @@ authors = [
 requires-python = ">=3.12"
 dependencies = [
     "ethbootstrap-languages",
+    "ethbootstrap-util",
 ]
 
 [build-system]
@@ -23,3 +24,4 @@ dev = [
 
 [tool.uv.sources]
 ethbootstrap-languages = { workspace = true }
+ethbootstrap-util = { workspace = true }
