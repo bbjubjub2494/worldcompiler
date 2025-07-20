@@ -13,20 +13,21 @@ from ethbootstrap_languages import Hex0Parser, Hex2Parser
 
 @pytest.fixture(scope="module")
 def hex0_contract():
-    target = boa.env.generate_address()
-    boa.env.set_code(target, ethbootstrap_seeds.hex0_bytecode)
+    target, _ = boa.env.deploy_code(bytecode=ethbootstrap_seeds.hex0_bytecode)
     return target
+
 
 @pytest.fixture(scope="module")
 def hex2_contract():
-    target = boa.env.generate_address()
-    boa.env.set_code(target, ethbootstrap_seeds.hex2_bytecode)
+    target, _ = boa.env.deploy_code(bytecode=ethbootstrap_seeds.hex2_bytecode)
     return target
+
 
 @pytest.fixture()
 def debug2(caplog):
     eth_utils.logging.setup_DEBUG2_logging()
     caplog.set_level(logging.DEBUG2, logger="eth.vm.computation.BaseComputation")
+
 
 @given(input_data=st.lists(st.from_regex(Hex0Parser.tokenizer.pattern, fullmatch=True)))
 def test_hex0(hex0_contract, input_data):

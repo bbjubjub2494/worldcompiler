@@ -2,7 +2,7 @@ import importlib.resources
 import subprocess
 
 from ethbootstrap_languages import Hex2Parser
-from ethbootstrap_util.solidity import compile_yul
+from ethbootstrap_util.solidity import compile_sol
 
 files = importlib.resources.files(__package__)
 
@@ -25,7 +25,8 @@ def compile_hex2(src):
 
 
 hex0_bytecode = compile_hex2(compile_M1(files / "hex0.M1"))
-hex2_bytecode = compile_yul(files / "hex2.yul", "hex2")
+hex0_bytecode = compile_sol(files / "hex0.sol", "hex0")
+hex2_bytecode = compile_sol(files / "hex2.sol", "hex2")
 trivial_initcode_prefix = compile_hex2(files / "trivial_initcode_prefix.hex2")
 
 __all__ = ["hex0_bytecode", "hex2_bytecode", "trivial_initcode_prefix"]
