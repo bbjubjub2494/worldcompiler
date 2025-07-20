@@ -3,16 +3,16 @@ from erc7955 import factory_deploy, factory_predict_address
 
 def test_example():
     initcode = bytes.fromhex(
-        "61"     # PUSH2
-                 # beginning of runtime code
-        "  33"   # CALLER
-        "  FF"   # SELFDESTRUCT
-                 # end of runtime code
-        "5F"     # PUSH0
-        "52"     # MSTORE
+        "61"  # PUSH2
+        # beginning of runtime code
+        "  33"  # CALLER
+        "  FF"  # SELFDESTRUCT
+        # end of runtime code
+        "5F"  # PUSH0
+        "52"  # MSTORE
         "60 02"  # PUSH2 2
         "60 1E"  # PUSH2 30
-        "F3"     # RETURN
+        "F3"  # RETURN
     )
     deployment_salt = b"\xa0" * 32
     deployed_address = factory_deploy(initcode, deployment_salt)

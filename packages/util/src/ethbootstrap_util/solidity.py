@@ -33,24 +33,26 @@ def compile_sol(src, contract_name, solc_version="0.8.28", solc_opts=[]):
 
 def compile_yul(src, contract_name, solc_version="0.8.28"):
     solc = get_solc(solc_version)
-    input_data = json.dumps({
-        "language": "Yul",
-        "sources": {
-            str(src.name): {
-                "content": src.read_text(encoding="utf-8"),
-            },
-        },
-        "settings": {
-            "outputSelection": {
-                "*": {
-                    "*": [
-                    "abi",
-                    "evm.bytecode.object",
-                    ],
+    input_data = json.dumps(
+        {
+            "language": "Yul",
+            "sources": {
+                str(src.name): {
+                    "content": src.read_text(encoding="utf-8"),
                 },
             },
-        },
-    })
+            "settings": {
+                "outputSelection": {
+                    "*": {
+                        "*": [
+                            "abi",
+                            "evm.bytecode.object",
+                        ],
+                    },
+                },
+            },
+        }
+    )
     data = json.loads(
         subprocess.run(
             [solc, "--standard-json"],
@@ -59,6 +61,8 @@ def compile_yul(src, contract_name, solc_version="0.8.28"):
             stdout=subprocess.PIPE,
         ).stdout
     )
-    for err in data['errors']:
-        print(err['formattedMessage'])
-    return bytes.fromhex(data["contracts"][str(src.name)][contract_name]["evm"]["bytecode"]["object"])
+    for err in data["errors"]:
+        print(err["formattedMessage"])
+    return bytes.fromhex(
+        data["contracts"][str(src.name)][contract_name]["evm"]["bytecode"]["object"]
+    )
