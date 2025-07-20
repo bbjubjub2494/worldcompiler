@@ -1,13 +1,8 @@
 contract hex0 {
     fallback() external {
         assembly {
-            let nibble_count
             let toggle
             let hold
-
-            let dirty := tload(0)
-            tstore(0, 1)
-            if dirty { revert(hold, toggle) } // reuse known zero slots
 
             let j := 0
             for { let i := 0 } lt(i, calldatasize()) { i := add(i, 1) } {

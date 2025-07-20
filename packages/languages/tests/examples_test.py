@@ -79,6 +79,7 @@ HEX2_EXAMPLES = HEX0_EXAMPLES + [
     Example(b"+label2 01 02 03 04 :label2", b"\x05\x01\x02\x03\x04"),
     Example(b"a1 +X b2 :X c3 +X d4", b"\xa1\x03\xb2\xc3\x03\xd4"),
     Example(b":label 00", b"\x00"),
+    Example(b"+label 00", b"\x00\x00"),
     Example(b"a :label b", b"\xab", error=ValueError),
     Example(b"cdef :something", b"\xcd\xef"),
     Example(b":a ab +a", b"\xab\x00"),
