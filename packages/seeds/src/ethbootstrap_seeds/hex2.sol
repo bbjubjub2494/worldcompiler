@@ -1,3 +1,6 @@
+// Prototype implementation of the hex2 bootstrap parser.
+// The goal is to make it reasonably optimized, then rewrite it in hex0.
+
 contract hex2 {
     fallback() external {
         assembly {
