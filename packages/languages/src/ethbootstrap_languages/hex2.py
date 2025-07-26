@@ -11,7 +11,7 @@ class LabelReference(NamedTuple):
 class Hex2Parser(ParserWithComments):
     @classmethod
     def _tokenizer(cls) -> Tokenizer:
-        label = rb"([a-zA-Z][a-zA-Z]*)"
+        label = rb"([a-zA-Z][a-zA-Z_]*)"
         return (
             super()
             ._tokenizer()

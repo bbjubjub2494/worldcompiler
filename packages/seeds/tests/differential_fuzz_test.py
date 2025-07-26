@@ -14,13 +14,19 @@ from ethbootstrap_languages import Hex0Parser, Hex2Parser
 
 @pytest.fixture(scope="module")
 def hex0_contract():
-    target, _ = boa.env.deploy_code(bytecode=ethbootstrap_seeds.hex0_bytecode)
+    target, _ = boa.env.deploy_code(
+        bytecode=ethbootstrap_seeds.trivial_initcode_prefix
+        + ethbootstrap_seeds.hex0_bytecode
+    )
     return target
 
 
 @pytest.fixture(scope="module")
 def hex2_contract():
-    target, _ = boa.env.deploy_code(bytecode=ethbootstrap_seeds.hex2_bytecode)
+    target, _ = boa.env.deploy_code(
+        bytecode=ethbootstrap_seeds.trivial_initcode_prefix
+        + ethbootstrap_seeds.hex2_bytecode
+    )
     return target
 
 
@@ -31,7 +37,7 @@ def debug2(caplog):
 
 
 def from_tokenizer(tokenizer):
-    pattern = rb"\(%s\)*" % tokenizer.pattern.pattern
+    pattern = rb"(%s)*" % tokenizer.pattern.pattern
     return st.from_regex(pattern, fullmatch=True)
 
 

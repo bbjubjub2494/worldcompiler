@@ -1,0 +1,204 @@
+;; hex0: a minimal hex decoder used for bootstrapping, supporting labels.
+
+;; STACK LAYOUT
+;; [0] nibble_count
+;; [1] toggle
+;; [2] hold
+;; [3] j
+;; [4] i
+;; [5] c, n, b
+
+PUSH0
+PUSH0
+PUSH0
+PUSH0
+PUSH0
+
+PUSH0
+SLOAD ; load dirty flag from transient
+PUSH1 '01'
+PUSH0
+SSTORE ; set dirty flag
+ISZERO
+PUSH1 +first_pass
+JUMPI ; if !dirty
+
+REVERT
+
+:first_pass
+JUMPDEST
+
+CALLDATASIZE
+DUP2
+LT
+ISZERO
+PUSH1 +first_pass_end
+JUMPI ; if i >= calldatasize
+
+DUP1
+CALLDATALOAD
+PUSH0
+BYTE ; c = byte(calldata[i])
+
+DUP1
+PUSH1 '30'
+GT
+DUP2
+PUSH1 '39'
+LT
+OR
+PUSH1 +first_pass_notnumber
+JUMPI ; if '0' > c || '9' < c
+
+PUSH1 '30'
+SWAP1
+SUB ; n = c - '0'
+PUSH1 +nibble
+JUMP
+
+:first_pass_notnumber
+JUMPDEST
+
+DUP1
+PUSH1 '61'
+GT
+DUP2
+PUSH1 '66'
+LT
+OR
+PUSH1 +first_pass_notlower
+JUMPI ; if 'a' > c || 'f' < c
+
+PUSH1 '57'
+SWAP1
+SUB ; n = c - 'a' + 10
+PUSH1 +nibble
+JUMP
+
+:first_pass_notlower
+JUMPDEST
+
+DUP1
+PUSH1 '41'
+GT
+DUP2
+PUSH1 '46'
+LT
+OR
+PUSH1 +first_pass_notupper
+JUMPI ; if 'A' > c || 'F' < c
+
+PUSH1 '37'
+SWAP1
+SUB ; n = c - 'A' + 10
+PUSH1 +nibble
+JUMP
+
+:first_pass_notupper
+JUMPDEST
+
+DUP1
+PUSH1 '3B'
+EQ
+DUP2
+PUSH1 '23'
+EQ
+OR
+PUSH1 +first_pass_comment
+JUMPI ; if c == ';" || c == '#'
+
+POP
+PUSH1 +first_pass_next
+JUMP
+
+:first_pass_comment
+JUMPDEST
+POP
+
+PUSH1 +first_pass_next ; return destination
+PUSH1 +eat_comment
+JUMP
+
+:nibble
+JUMPDEST
+
+DUP5
+PUSH1 +toggle_on
+JUMPI ; if toggle
+
+PUSH1 '04'
+SHL
+SWAP3
+POP ; hold = n << 4
+
+PUSH1 +after_toggle
+JUMP
+
+:toggle_on
+JUMPDEST
+
+DUP4
+OR ; b := hold | n
+
+DUP3
+MSTORE8 ; mem[j] = v
+
+SWAP1
+PUSH1 '01'
+ADD
+SWAP1 ; j++
+
+:after_toggle
+JUMPDEST
+
+SWAP3
+ISZERO
+SWAP3 ; toggle = !toggle
+
+:first_pass_next
+JUMPDEST
+
+PUSH1 '01'
+ADD ; i++
+
+PUSH1 +first_pass
+JUMP
+
+:first_pass_end
+JUMPDEST
+
+SWAP1
+PUSH0
+RETURN ; return mem[0:j]
+
+:eat_comment
+JUMPDEST
+SWAP1 ; bring up i
+
+:eat_comment_loop
+JUMPDEST
+PUSH1 '01'
+ADD ; i++
+
+CALLDATASIZE
+DUP2
+LT
+ISZERO
+PUSH1 +comment_end
+JUMPI ; if i >= calldatasize
+
+DUP1
+CALLDATALOAD
+PUSH0
+BYTE ; c = byte(calldata[i])
+
+PUSH1 '0a'
+SUB
+PUSH1 +eat_comment_loop
+JUMPI ; if ('\n' - c != 0)
+
+:comment_end
+JUMPDEST
+
+SWAP1 ; restore i
+JUMP ; return
